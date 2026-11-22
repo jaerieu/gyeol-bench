@@ -21,4 +21,4 @@
 - [x] **Offline Determinism (`0 CU`)**: `ExactRationalOracle` uses pure Python `fractions.Fraction` with deterministic seed generation and zero live API calls during unit testing.
 - [x] **Strict Envelope Hygiene**: Non-JSON prose, missing fields, booleans, and non-finite floats deterministically trigger `PARSE_REJECT`.
 - [x] **Mixed Tolerance Equivalence**: `|candidate - truth| <= 1e-4 + 1e-5 * max(|candidate|, |truth|)` enforced after exact base-unit conversion.
-- [ ] **Stage 1 Live Model Matrix (`K2` · `K3` · `K4`)**: Frozen baseline hash publication at least 14 days prior to Day 60 (`b - c >= 40`, `b + c < 416`, `McNemar p < 0.05`; normal control false-positive `<= 5 / 400`).
+- [ ] **Stage 1 Live Model Matrix (`K2` · `K3` · `K4`)**: Frozen baseline hash publication at least 14 days prior to Day 60 (`b - c >= 40`, two-sided exact McNemar p < 0.05 (requires b + c <= 396 at the b - c = 40 boundary); normal control false-positive `<= 5 / 400`).
