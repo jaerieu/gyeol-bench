@@ -150,17 +150,17 @@ class EnvelopeParseResult:
     unit: str = ""
     retracted_ids: Tuple[str, ...] = ()
     reason: str = ""
+    preserved: Tuple[Tuple[str, Fraction, str], ...] = ()
 
 
-def parse_step_envelope(raw_text: str) -> EnvelopeParseResult:
-    """Strict JSON step envelope gate; rejects prose, missing keys, booleans, and NaN/Inf."""
+def response_adapter(raw_text: str, required_preserved: Sequence[str] = ()) -> EnvelopeParseResult:
+    """Strict JSON step-envelope gate; rejects prose, missing keys, booleans, and NaN/Inf."""
     if not isinstance(raw_text, str):
         return EnvelopeParseResult(ok=False, status="PARSE_REJECT", reason="Response is not a string.")
     stripped = raw_text.strip()
     if not stripped.startswith("{") or not stripped.endswith("}"):
         return EnvelopeParseResult(
-            ok=False,
-            status="PARSE_REJECT",
+            ok=False, status="PARSE_REJECT",
             reason="Response must be a standalone JSON object without free-form prose.",
         )
 
@@ -171,44 +171,50 @@ def parse_step_envelope(raw_text: str) -> EnvelopeParseResult:
         payload = json.loads(stripped, parse_constant=_reject_constant)
     except Exception as exc:
         return EnvelopeParseResult(ok=False, status="PARSE_REJECT", reason=f"Invalid JSON: {exc}")
-
     if not isinstance(payload, dict):
         return EnvelopeParseResult(ok=False, status="PARSE_REJECT", reason="Envelope root must be an object.")
 
     required = {"step_id", "value", "unit", "retracted_ids"}
     missing = required - set(payload.keys())
     if missing:
-        return EnvelopeParseResult(
-            ok=False,
-            status="PARSE_REJECT",
-            reason=f"Missing required keys: {sorted(missing)}",
-        )
-    extra = set(payload.keys()) - (required | {"notes"})
+        return EnvelopeParseResult(ok=False, status="PARSE_REJECT", reason=f"Missing required keys: {sorted(missing)}")
+    extra = set(payload.keys()) - (required | {"notes", "preserved"})
     if extra:
-        return EnvelopeParseResult(
-            ok=False,
-            status="PARSE_REJECT",
-            reason=f"Unexpected envelope keys: {sorted(extra)}",
-        )
+        return EnvelopeParseResult(ok=False, status="PARSE_REJECT", reason=f"Unexpected envelope keys: {sorted(extra)}")
 
-    step_id = payload["step_id"]
+    step_id, unit, retracted_raw = payload["step_id"], payload["unit"], payload["retracted_ids"]
     if not isinstance(step_id, str) or not step_id.strip():
         return EnvelopeParseResult(ok=False, status="PARSE_REJECT", reason="Invalid step_id.")
-
-    unit = payload["unit"]
     if not isinstance(unit, str) or not unit.strip():
         return EnvelopeParseResult(ok=False, status="PARSE_REJECT", reason="Invalid unit field.")
-
-    retracted_raw = payload["retracted_ids"]
-    if not isinstance(retracted_raw, list) or any(
-        not isinstance(item, str) or not item.strip() for item in retracted_raw
-    ):
+    if not isinstance(retracted_raw, list) or any(not isinstance(item, str) or not item.strip() for item in retracted_raw):
         return EnvelopeParseResult(ok=False, status="PARSE_REJECT", reason="retracted_ids must be list[str].")
 
     try:
         val_frac = to_exact_fraction(payload["value"])
     except ValueError as exc:
         return EnvelopeParseResult(ok=False, status="PARSE_REJECT", reason=str(exc))
+
+    preserved_items: List[Tuple[str, Fraction, str]] = []
+    if required_preserved and "preserved" not in payload:
+        return EnvelopeParseResult(ok=False, status="PARSE_REJECT", reason="Missing required 'preserved' mapping.")
+    if "preserved" in payload:
+        raw_pres = payload["preserved"]
+        if not isinstance(raw_pres, dict):
+            return EnvelopeParseResult(ok=False, status="PARSE_REJECT", reason="preserved must be an object.")
+        for k, v in sorted(raw_pres.items()):
+            if not isinstance(k, str) or not k.strip() or not isinstance(v, dict) or set(v.keys()) != {"value", "unit"}:
+                return EnvelopeParseResult(ok=False, status="PARSE_REJECT", reason=f"Invalid preserved entry for {k!r}.")
+            if not isinstance(v["unit"], str) or not v["unit"].strip():
+                return EnvelopeParseResult(ok=False, status="PARSE_REJECT", reason=f"Invalid preserved unit for {k!r}.")
+            try:
+                pv = to_exact_fraction(v["value"])
+            except ValueError as exc:
+                return EnvelopeParseResult(ok=False, status="PARSE_REJECT", reason=f"Invalid preserved value for {k!r}: {exc}")
+            preserved_items.append((k.strip(), pv, v["unit"].strip()))
+        missing_p = set(required_preserved) - {k for k, _, _ in preserved_items}
+        if missing_p:
+            return EnvelopeParseResult(ok=False, status="PARSE_REJECT", reason=f"Missing preserved keys: {sorted(missing_p)}")
 
     return EnvelopeParseResult(
         ok=True,
@@ -217,7 +223,13 @@ def parse_step_envelope(raw_text: str) -> EnvelopeParseResult:
         value_fraction=val_frac,
         unit=unit.strip(),
         retracted_ids=tuple(sorted(set(item.strip() for item in retracted_raw))),
+        preserved=tuple(preserved_items),
     )
+
+
+def parse_step_envelope(raw_text: str) -> EnvelopeParseResult:
+    """Backwards-compatible alias for `response_adapter`."""
+    return response_adapter(raw_text)
 
 
 @dataclass(frozen=True)
@@ -369,6 +381,13 @@ class OracleEvaluationResult:
     reason: str = ""
 
 
+def _eval_turns(turns: Sequence[TurnSpec]) -> OracleStateSnapshot:
+    oracle = ExactRationalOracle()
+    for t in turns:
+        oracle.append_turn(t)
+    return oracle.evaluate()
+
+
 def evaluate_retraction_episode(
     turns: Sequence[TurnSpec],
     raw_model_output: str,
@@ -376,12 +395,10 @@ def evaluate_retraction_episode(
     expected_unit: Optional[str] = None,
     abs_tol: float = 1e-4,
     rel_tol: float = 1e-5,
+    preserved_targets: Optional[Dict[str, str]] = None,
 ) -> OracleEvaluationResult:
-    """End-to-end deterministic scoring of a multi-turn episode against a JSON step response."""
-    oracle = ExactRationalOracle()
-    for t in turns:
-        oracle.append_turn(t)
-    snap = oracle.evaluate()
+    """Deterministic 4-way split scoring of a multi-turn episode against a JSON step envelope."""
+    snap = _eval_turns(turns)
     if target_node_id not in snap.active_values_base:
         raise ValueError(f"Target node {target_node_id!r} not active in oracle state.")
 
@@ -390,209 +407,230 @@ def evaluate_retraction_episode(
     truth_target = convert_from_base_fraction(truth_base, truth_dim, display_unit)
     expected_retracted = tuple(sorted(snap.retracted_ids))
 
-    env = parse_step_envelope(raw_model_output)
-    if not env.ok or env.value_fraction is None:
+    pre_truth_target: Optional[Fraction] = None
+    if expected_retracted:
+        pre_snap = _eval_turns([t for t in turns if t.kind != "retract"])
+        if target_node_id in pre_snap.active_values_base:
+            pb, pdim, _ = pre_snap.active_values_base[target_node_id]
+            if pdim == truth_dim:
+                pre_truth_target = convert_from_base_fraction(pb, pdim, display_unit)
+
+    req_pres = tuple(preserved_targets.keys()) if preserved_targets else ()
+    env = response_adapter(raw_model_output, required_preserved=req_pres)
+    if not env.ok or env.value_fraction is None or env.step_id != target_node_id:
+        reason = env.reason if not env.ok else f"Expected step_id={target_node_id!r}, got {env.step_id!r}."
         return OracleEvaluationResult(
-            ok=False,
-            verdict="PARSE_REJECT",
-            truth_base_fraction=truth_base,
-            truth_target_fraction=truth_target,
-            truth_dimension=truth_dim,
-            candidate_base_fraction=None,
-            abs_diff=None,
-            allowed_tol=None,
-            expected_retracted_ids=expected_retracted,
-            observed_retracted_ids=(),
-            reason=env.reason,
+            ok=False, verdict="PARSE_REJECT", truth_base_fraction=truth_base,
+            truth_target_fraction=truth_target, truth_dimension=truth_dim,
+            candidate_base_fraction=None, abs_diff=None, allowed_tol=None,
+            expected_retracted_ids=expected_retracted, observed_retracted_ids=(), reason=reason,
         )
 
     try:
         cand_base, cand_dim, _ = normalize_to_base_fraction(env.value_fraction, env.unit)
     except DimensionMismatchError as exc:
         return OracleEvaluationResult(
-            ok=False,
-            verdict="UNIT_MISMATCH",
-            truth_base_fraction=truth_base,
-            truth_target_fraction=truth_target,
-            truth_dimension=truth_dim,
-            candidate_base_fraction=None,
-            abs_diff=None,
-            allowed_tol=None,
-            expected_retracted_ids=expected_retracted,
-            observed_retracted_ids=env.retracted_ids,
-            reason=str(exc),
+            ok=False, verdict="CONDITIONAL_ARITH_ERROR", truth_base_fraction=truth_base,
+            truth_target_fraction=truth_target, truth_dimension=truth_dim,
+            candidate_base_fraction=None, abs_diff=None, allowed_tol=None,
+            expected_retracted_ids=expected_retracted, observed_retracted_ids=env.retracted_ids, reason=str(exc),
         )
 
     if cand_dim != truth_dim:
         return OracleEvaluationResult(
-            ok=False,
-            verdict="UNIT_MISMATCH",
-            truth_base_fraction=truth_base,
-            truth_target_fraction=truth_target,
-            truth_dimension=truth_dim,
-            candidate_base_fraction=cand_base,
-            abs_diff=None,
-            allowed_tol=None,
-            expected_retracted_ids=expected_retracted,
-            observed_retracted_ids=env.retracted_ids,
+            ok=False, verdict="CONDITIONAL_ARITH_ERROR", truth_base_fraction=truth_base,
+            truth_target_fraction=truth_target, truth_dimension=truth_dim,
+            candidate_base_fraction=cand_base, abs_diff=None, allowed_tol=None,
+            expected_retracted_ids=expected_retracted, observed_retracted_ids=env.retracted_ids,
             reason=f"Dimension mismatch: candidate {cand_dim} vs truth {truth_dim}.",
         )
 
-    if env.retracted_ids != expected_retracted:
+    cand_in_display = convert_from_base_fraction(cand_base, cand_dim, display_unit)
+    matched, diff, allowed = mixed_tolerance_match(cand_in_display, truth_target, abs_tol=abs_tol, rel_tol=rel_tol)
+
+    if (
+        pre_truth_target is not None
+        and not matched
+        and mixed_tolerance_match(cand_in_display, pre_truth_target, abs_tol=abs_tol, rel_tol=rel_tol)[0]
+    ):
         return OracleEvaluationResult(
-            ok=False,
-            verdict="RETRACTION_SET_MISMATCH",
-            truth_base_fraction=truth_base,
-            truth_target_fraction=truth_target,
-            truth_dimension=truth_dim,
-            candidate_base_fraction=cand_base,
-            abs_diff=None,
-            allowed_tol=None,
-            expected_retracted_ids=expected_retracted,
-            observed_retracted_ids=env.retracted_ids,
-            reason=f"Expected retracted_ids={list(expected_retracted)}, got {list(env.retracted_ids)}.",
+            ok=False, verdict="STALE_STATE_RETENTION", truth_base_fraction=truth_base,
+            truth_target_fraction=truth_target, truth_dimension=truth_dim,
+            candidate_base_fraction=cand_base, abs_diff=diff, allowed_tol=allowed,
+            expected_retracted_ids=expected_retracted, observed_retracted_ids=env.retracted_ids,
+            reason="Candidate retained stale pre-retraction value.",
         )
 
-    cand_in_display = convert_from_base_fraction(cand_base, cand_dim, display_unit)
-    matched, diff, allowed = mixed_tolerance_match(
-        cand_in_display,
-        truth_target,
-        abs_tol=abs_tol,
-        rel_tol=rel_tol,
-    )
+    extra_retracted = sorted(set(env.retracted_ids) - set(expected_retracted))
+    pres_err = ""
+    pres_map = {k: (v, u) for k, v, u in env.preserved}
+    for pid, punit in (preserved_targets or {}).items():
+        pbase, pdim, _ = snap.active_values_base[pid]
+        ptruth = convert_from_base_fraction(pbase, pdim, punit)
+        pv, pu = pres_map[pid]
+        try:
+            pc_base, pc_dim, _ = normalize_to_base_fraction(pv, pu)
+            if pc_dim != pdim or not mixed_tolerance_match(
+                convert_from_base_fraction(pc_base, pc_dim, punit), ptruth, abs_tol=abs_tol, rel_tol=rel_tol
+            )[0]:
+                pres_err = f"Preserved node {pid!r} value or scale altered."
+                break
+        except DimensionMismatchError as exc:
+            pres_err = f"Preserved node {pid!r} unit error: {exc}"
+            break
+
+    if extra_retracted or pres_err:
+        return OracleEvaluationResult(
+            ok=False, verdict="OVER_RETRACTION", truth_base_fraction=truth_base,
+            truth_target_fraction=truth_target, truth_dimension=truth_dim,
+            candidate_base_fraction=cand_base, abs_diff=diff, allowed_tol=allowed,
+            expected_retracted_ids=expected_retracted, observed_retracted_ids=env.retracted_ids,
+            reason=pres_err or f"Spurious retracted_ids: {extra_retracted}.",
+        )
+
+    if env.retracted_ids != expected_retracted or not matched:
+        reason = (
+            f"Expected retracted_ids={list(expected_retracted)}, got {list(env.retracted_ids)}."
+            if env.retracted_ids != expected_retracted
+            else f"Difference {float(diff):.6g} exceeds tolerance {float(allowed):.6g}."
+        )
+        return OracleEvaluationResult(
+            ok=False, verdict="CONDITIONAL_ARITH_ERROR", truth_base_fraction=truth_base,
+            truth_target_fraction=truth_target, truth_dimension=truth_dim,
+            candidate_base_fraction=cand_base, abs_diff=diff, allowed_tol=allowed,
+            expected_retracted_ids=expected_retracted, observed_retracted_ids=env.retracted_ids, reason=reason,
+        )
+
     return OracleEvaluationResult(
-        ok=matched,
-        verdict="PASS" if matched else "VALUE_MISMATCH",
-        truth_base_fraction=truth_base,
-        truth_target_fraction=truth_target,
-        truth_dimension=truth_dim,
-        candidate_base_fraction=cand_base,
-        abs_diff=diff,
-        allowed_tol=allowed,
-        expected_retracted_ids=expected_retracted,
-        observed_retracted_ids=env.retracted_ids,
-        reason="" if matched else f"Difference {float(diff):.6g} exceeds tolerance {float(allowed):.6g}.",
+        ok=True, verdict="PASS", truth_base_fraction=truth_base,
+        truth_target_fraction=truth_target, truth_dimension=truth_dim,
+        candidate_base_fraction=cand_base, abs_diff=diff, allowed_tol=allowed,
+        expected_retracted_ids=expected_retracted, observed_retracted_ids=env.retracted_ids,
     )
 
 
 @dataclass(frozen=True)
 class RetractionEpisode:
     episode_id: str
-    category: str  # "retraction" | "unit_scale" | "normal"
+    category: str  # "normal" | "perturbed"
     prompt: str
     turns: Tuple[TurnSpec, ...]
     target_node_id: str
     expected_unit: str
     expected_value_float: float
     expected_retracted_ids: Tuple[str, ...] = field(default_factory=tuple)
+    condition: str = "A"  # "A" | "B" | "C" | "D" | "E"
+    preserved_targets: Tuple[Tuple[str, str], ...] = field(default_factory=tuple)
+    pre_retraction_value_float: Optional[float] = None
 
 
 def generate_procedural_dataset(seed: int = 20261122, count: int = 800) -> List[RetractionEpisode]:
-    """Deterministically generate balanced retraction, unit-scale, and normal control episodes."""
+    """Deterministically generate N=800 balanced 5-condition factorial episodes (A=400, B..E=100 each)."""
     if count <= 0:
         raise ValueError("count must be positive.")
     rng = random.Random(seed)
-    n_retract = count // 4
-    n_unit = count // 4
-    n_normal = count - n_retract - n_unit
-
-    categories = (
-        ["retraction"] * n_retract
-        + ["unit_scale"] * n_unit
-        + ["normal"] * n_normal
+    cond_cycle = ("A", "B", "A", "C", "A", "D", "A", "E")
+    retraction_ops = ("fix->", "err->", "sup->")
+    scale_specs = (
+        ("mg", "g", "%", 1, 6, 250, 1750, 2, 8),
+        ("K_USD", "M_USD", "bps", 1, 5, 200, 900, 2, 8),
+        ("cm", "m", "%", 1, 6, 20, 90, 2, 7),
+        ("mL", "L", "%", 1, 5, 200, 800, 2, 7),
     )
-
     episodes: List[RetractionEpisode] = []
-    retraction_ops = ["fix->", "err->", "sup->"]
 
-    for idx, cat in enumerate(categories):
-        ep_id = f"gb-{idx + 1:04d}"
-        if cat == "retraction":
-            a_init = rng.randint(10, 90)
-            a_fix = rng.randint(100, 250)
-            b_val = rng.randint(5, 60)
-            rate_pct = rng.choice([10, 15, 20, 25])
-            op_tok = retraction_ops[idx % len(retraction_ops)]
+    for idx in range(count):
+        ep_id, cond = f"gb-{idx + 1:04d}", cond_cycle[idx % 8]
+        op_tok = retraction_ops[idx % 3]
+        target_id, preserved = "d2", ()
+        if cond == "A":
+            unit = ("km", "g", "L", "s", "M_USD")[idx % 5]
             turns = (
-                TurnSpec(node_id="p1", kind="premise", value=a_init, unit="M_USD"),
-                TurnSpec(node_id="p2", kind="premise", value=b_val, unit="M_USD"),
-                TurnSpec(node_id="p3", kind="premise", value=rate_pct, unit="%"),
-                TurnSpec(node_id="d1", kind="derive", arith_op="add", left_id="p1", right_id="p2"),
-                TurnSpec(node_id="d2", kind="derive", arith_op="mul", left_id="d1", right_id="p3"),
-                TurnSpec(
-                    node_id="p1_r1",
-                    kind="retract",
-                    retraction_op=op_tok,
-                    target_id="p1",
-                    value=a_fix,
-                    unit="M_USD",
-                ),
+                TurnSpec("p1", "premise", rng.randint(12, 80), unit),
+                TurnSpec("p2", "premise", rng.randint(8, 40), unit),
+                TurnSpec("p3", "premise", rng.randint(2, 6), "scalar"),
+                TurnSpec("d1", "derive", arith_op="add", left_id="p1", right_id="p2"),
+                TurnSpec("d2", "derive", arith_op="mul", left_id="d1", right_id="p3"),
             )
-            expected_unit = "M_USD"
-        elif cat == "unit_scale":
-            mg_val = rng.randint(250, 1750)
-            g_val = rng.randint(1, 6)
-            mult = rng.randint(2, 5)
+            expected_unit = unit
+        elif cond == "B":
+            unit = ("M_USD", "g", "km", "L")[idx % 4]
             turns = (
-                TurnSpec(node_id="p1", kind="premise", value=mg_val, unit="mg"),
-                TurnSpec(node_id="p2", kind="premise", value=g_val, unit="g"),
-                TurnSpec(node_id="p3", kind="premise", value=mult, unit="scalar"),
-                TurnSpec(node_id="d1", kind="derive", arith_op="add", left_id="p1", right_id="p2"),
-                TurnSpec(node_id="d2", kind="derive", arith_op="mul", left_id="d1", right_id="p3"),
+                TurnSpec("p1", "premise", rng.randint(10, 90), unit),
+                TurnSpec("p2", "premise", rng.randint(5, 60), unit),
+                TurnSpec("p3", "premise", rng.randint(2, 6), "scalar"),
+                TurnSpec("d1", "derive", arith_op="add", left_id="p1", right_id="p2"),
+                TurnSpec("d2", "derive", arith_op="mul", left_id="d1", right_id="p3"),
+                TurnSpec("p1_r1", "retract", rng.randint(100, 250), unit, retraction_op=op_tok, target_id="p1"),
             )
-            expected_unit = "g"
+            expected_unit = unit
+        elif cond == "C":
+            unit, target_id = ("g", "km", "M_USD", "L")[idx % 4], "d3"
+            turns = (
+                TurnSpec("p1", "premise", rng.randint(15, 75), unit),
+                TurnSpec("p2", "premise", rng.randint(10, 50), unit),
+                TurnSpec("p3", "premise", rng.randint(2, 5), "scalar"),
+                TurnSpec("p4", "premise", rng.randint(5, 30), unit),
+                TurnSpec("d1", "derive", arith_op="add", left_id="p1", right_id="p2"),
+                TurnSpec("d2", "derive", arith_op="mul", left_id="d1", right_id="p3"),
+                TurnSpec("d3", "derive", arith_op="sub", left_id="d2", right_id="p4"),
+                TurnSpec("p1_r1", "retract", rng.randint(90, 220), unit, retraction_op=op_tok, target_id="p1"),
+            )
+            expected_unit = unit
+        elif cond == "D":
+            u_sm, u_lg, u_rt, lo2, hi2, lo1, hi1, rlo, rhi = scale_specs[idx % 4]
+            rt_v = rng.choice((500, 1000, 1500, 2000) if u_rt == "bps" else (10, 15, 20, 25))
+            turns = (
+                TurnSpec("p1", "premise", rng.randint(lo1, hi1), u_sm),
+                TurnSpec("p2", "premise", rng.randint(lo2, hi2), u_lg),
+                TurnSpec("p3", "premise", rt_v, u_rt),
+                TurnSpec("d1", "derive", arith_op="add", left_id="p1", right_id="p2"),
+                TurnSpec("d2", "derive", arith_op="mul", left_id="d1", right_id="p3"),
+                TurnSpec("p1_r1", "retract", rng.randint(rlo, rhi), u_lg, retraction_op=op_tok, target_id="p1"),
+            )
+            expected_unit = u_sm if (idx // 8) % 2 else u_lg
         else:
-            v1 = rng.randint(12, 80)
-            v2 = rng.randint(8, 40)
-            v3 = rng.randint(2, 6)
+            unit, indep_u = (("M_USD", "g"), ("g", "km"), ("km", "L"), ("L", "M_USD"))[idx % 4]
             turns = (
-                TurnSpec(node_id="p1", kind="premise", value=v1, unit="km"),
-                TurnSpec(node_id="p2", kind="premise", value=v2, unit="km"),
-                TurnSpec(node_id="p3", kind="premise", value=v3, unit="scalar"),
-                TurnSpec(node_id="d1", kind="derive", arith_op="add", left_id="p1", right_id="p2"),
-                TurnSpec(node_id="d2", kind="derive", arith_op="mul", left_id="d1", right_id="p3"),
+                TurnSpec("p1", "premise", rng.randint(10, 90), unit),
+                TurnSpec("p2", "premise", rng.randint(5, 60), unit),
+                TurnSpec("p3", "premise", rng.randint(2, 5), "scalar"),
+                TurnSpec("u1", "premise", rng.randint(15, 85), indep_u),
+                TurnSpec("u2", "premise", rng.randint(10, 40), indep_u),
+                TurnSpec("d1", "derive", arith_op="add", left_id="p1", right_id="p2"),
+                TurnSpec("d2", "derive", arith_op="mul", left_id="d1", right_id="p3"),
+                TurnSpec("d_indep", "derive", arith_op="add", left_id="u1", right_id="u2"),
+                TurnSpec("p1_r1", "retract", rng.randint(100, 250), unit, retraction_op=op_tok, target_id="p1"),
             )
-            expected_unit = "km"
+            expected_unit, preserved = unit, (("d_indep", indep_u),)
 
-        oracle = ExactRationalOracle()
-        for t in turns:
-            oracle.append_turn(t)
-        snap = oracle.evaluate()
-        base_val, dim, _ = snap.active_values_base["d2"]
+        snap = _eval_turns(turns)
+        base_val, dim, _ = snap.active_values_base[target_id]
         target_frac = convert_from_base_fraction(base_val, dim, expected_unit)
         retracted_sorted = tuple(sorted(snap.retracted_ids))
+        pre_float: Optional[float] = None
+        if retracted_sorted:
+            pb, pdim, _ = _eval_turns([t for t in turns if t.kind != "retract"]).active_values_base[target_id]
+            pre_float = float(convert_from_base_fraction(pb, pdim, expected_unit))
 
-        turn_lines = []
-        for i, t in enumerate(turns, start=1):
-            if t.kind == "premise":
-                turn_lines.append(f"Turn {i} [{t.node_id}]: value = {t.value} {t.unit}")
-            elif t.kind == "derive":
-                turn_lines.append(f"Turn {i} [{t.node_id}]: {t.arith_op}({t.left_id}, {t.right_id})")
-            elif t.kind == "retract":
-                turn_lines.append(
-                    f"Turn {i} [{t.node_id}]: {t.retraction_op} {t.target_id} := {t.value} {t.unit}"
-                )
-
+        turn_lines = [
+            f"Turn {i} [{t.node_id}]: value = {t.value} {t.unit}" if t.kind == "premise"
+            else f"Turn {i} [{t.node_id}]: {t.arith_op}({t.left_id}, {t.right_id})" if t.kind == "derive"
+            else f"Turn {i} [{t.node_id}]: {t.retraction_op} {t.target_id} := {t.value} {t.unit}"
+            for i, t in enumerate(turns, start=1)
+        ]
+        pres_schema = f', "preserved": {{"{preserved[0][0]}": {{"value": <number>, "unit": "{preserved[0][1]}"}}}}' if preserved else ""
         prompt = (
-            "Compute the final value of node 'd2' in unit "
-            f"'{expected_unit}'. Respond ONLY with a JSON object containing keys "
-            '{"step_id": "d2", "value": <number>, "unit": "'
-            + expected_unit
-            + '", "retracted_ids": [<retracted node ids>]}.\n'
-            + "\n".join(turn_lines)
+            f"Compute the final value of node '{target_id}' in unit '{expected_unit}'. Respond ONLY with a JSON object "
+            f'containing keys {{"step_id": "{target_id}", "value": <number>, "unit": "{expected_unit}", '
+            f'"retracted_ids": [<retracted node ids>]{pres_schema}}}.\n' + "\n".join(turn_lines)
         )
-
         episodes.append(
             RetractionEpisode(
-                episode_id=ep_id,
-                category=cat,
-                prompt=prompt,
-                turns=turns,
-                target_node_id="d2",
-                expected_unit=expected_unit,
-                expected_value_float=float(target_frac),
-                expected_retracted_ids=retracted_sorted,
+                episode_id=ep_id, category="normal" if cond == "A" else "perturbed", prompt=prompt,
+                turns=turns, target_node_id=target_id, expected_unit=expected_unit,
+                expected_value_float=float(target_frac), expected_retracted_ids=retracted_sorted,
+                condition=cond, preserved_targets=preserved, pre_retraction_value_float=pre_float,
             )
         )
-
     return episodes

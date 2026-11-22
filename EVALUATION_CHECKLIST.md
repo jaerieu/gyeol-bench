@@ -12,13 +12,14 @@
 | `pyproject.toml` | Declares `inspect_ai >= 0.3.0` and `inspect_ai` entry point | `[안전]` Verified |
 | `eval.yaml` | Structured task metadata, sample counts (`N = 800`), tolerance parameters | `[안전]` Verified |
 | `EVALUATION_CHECKLIST.md` | Pre-submission reproducibility, contamination, and statistical audit checklist | `[안전]` Verified |
-| `agent_artefacts/retraction_dag_0.1.0/validity/VALIDITY_REPORT.md` | Construct validity, `Fraction` oracle soundness, `McNemar` / `Clopper-Pearson` bounds | `[주의]` Pre-launch staged |
-| `agent_artefacts/retraction_dag_0.1.0/review/SUMMARY.md` | Independent code & zero-core boundary review record | `[주의]` Pre-launch staged |
+| `agent_artefacts/retraction_dag_0.1.0/validity/VALIDITY_REPORT.md` | Construct validity, `Condition A..E`, 4-way error split, `McNemar` / `Clopper-Pearson` bounds | `[안전]` Verified |
+| `agent_artefacts/retraction_dag_0.1.0/review/SUMMARY.md` | Independent code, `SymPy + Pint` `800/800` cross-oracle & zero-core review record | `[안전]` Verified |
 
 ## 2. Technical & Governance Gates
 
 - [x] **Zero Private Core Boundary**: Static AST + regex check (`python3 scripts/check_zero_core.py`) confirms `0` private engine imports or symbols and `0` visual-spectrum terms.
 - [x] **Offline Determinism (`0 CU`)**: `ExactRationalOracle` uses pure Python `fractions.Fraction` with deterministic seed generation and zero live API calls during unit testing.
-- [x] **Strict Envelope Hygiene**: Non-JSON prose, missing fields, booleans, and non-finite floats deterministically trigger `PARSE_REJECT`.
+- [x] **Strict Envelope Hygiene (`response_adapter`)**: Non-JSON prose, missing fields, booleans, and non-finite floats deterministically trigger `PARSE_REJECT`.
+- [x] **5-Condition Factorial & 4-Way Error Split**: `N = 800` balanced (`400` `Condition A` + `100` each `Condition B..E`), decomposed across `PARSE_REJECT`, `CONDITIONAL_ARITH_ERROR`, `STALE_STATE_RETENTION`, and `OVER_RETRACTION`.
 - [x] **Mixed Tolerance Equivalence**: `|candidate - truth| <= 1e-4 + 1e-5 * max(|candidate|, |truth|)` enforced after exact base-unit conversion.
-- [ ] **Stage 1 Live Model Matrix (`K2` · `K3` · `K4`)**: Frozen baseline hash publication at least 14 days prior to Day 60 (`b - c >= 40`, two-sided exact McNemar p < 0.05 (requires b + c <= 396 at the b - c = 40 boundary); normal control false-positive `<= 5 / 400`).
+- [ ] **Stage 1 Live Model Matrix (`K2` · `K3` · `K4`) & Human Audit (`N >= 150`)**: Frozen baseline hash publication at least 14 days prior to Day 60 (`b - c >= 40`, two-sided exact McNemar p < 0.05 (requires b + c <= 396 at the b - c = 40 boundary); normal control false-positive `<= 5 / 400`).

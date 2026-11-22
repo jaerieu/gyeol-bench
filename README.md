@@ -22,13 +22,13 @@ Long-horizon agent architectures increasingly run as durable **Stateful Actors**
 | `Belief-R1` | Commonsense belief suppression | No | No | No |
 | **`TRACK (EACL 2026)`** (Feng et al.) | Parametric vs context conflict (`WIKI`/`CODE`/`MATH`; `0` `fix->`/`err->`/`sup->` ops) | Multi-step `MATH` propagation (`0` exact `Fraction` DAG ledger) | No | No |
 | **`FPCO-Dialog (EMNLP 2026)`** (Ma et al., HIT Shenzhen) | Multi-turn (`10`-turn) false-premise VLM dialog (`CorrTP@K`) | No (pragmatic visual premise correction) | No | No |
-| **`Gyeol-Bench`** | **Yes (`fix->` · `err->` · `sup->`)** | **Yes (`fractions.Fraction` DAG cascade)** | **Yes (`mg/g/kg` · `K/M/B` · `%`/`bps`)** | **Yes (`PARSE_REJECT` gate; `Condition E` staged in Track A)** |
+| **`Gyeol-Bench`** | **Yes (`fix->` · `err->` · `sup->`)** | **Yes (`fractions.Fraction` DAG cascade)** | **Yes (`mg/g/kg` · `K/M/B` · `%`/`bps`)** | **Yes (`Condition E` + `response_adapter` `PARSE_REJECT` gate)** |
 
 ## 2. Clean-Room Components (`0` Private Core Lines)
 
-1. **Procedural Multi-Turn DAG & Unit Generator**: Deterministic local CPU (`0 CU`) generator producing `N = 800` balanced episodes (`400` perturbation: `200` premise retraction + `200` unit/scale shift; `400` normal control).
+1. **Procedural 5-Condition Multi-Turn DAG & Unit Generator**: Deterministic local CPU (`0 CU`) generator producing `N = 800` balanced episodes (`400` normal control `Condition A` + `400` perturbation: `100` `Condition B` single retraction, `100` `Condition C` `>= 3`-hop chain re-propagation, `100` `Condition D` simultaneous retraction + SI/scale shift, `100` `Condition E` retraction + unrelated `d_indep` preservation).
 2. **Exact Rational Ground-Truth Oracle (`gyeol_bench/oracle.py`)**: Pure Python `fractions.Fraction` evaluator computing exact rational downstream values across non-destructive retraction chains.
-3. **JSON Step Response Envelope Gate**: Enforces structured JSON step responses (`step_id`, `value`, `unit`, `retracted_ids`) and assigns `PARSE_REJECT` on malformed, missing-key, non-finite, or free-prose numeric outputs.
+3. **JSON Step Response Envelope Gate (`response_adapter`) & 4-Way Error Split**: Enforces structured JSON step responses (`step_id`, `value`, `unit`, `retracted_ids`, and `preserved` under `Condition E`) and deterministically decomposes failures into `PARSE_REJECT`, `CONDITIONAL_ARITH_ERROR`, `STALE_STATE_RETENTION`, and `OVER_RETRACTION`.
 4. **Mixed Tolerance Comparator**: Clean-room exact formula `|a - b| <= 1e-4 + 1e-5 * max(|a|, |b|)` combined with dimensional consistency verification.
 
 ## 3. Quickstart (`Inspect AI` & Pure Python Stdlib)
@@ -49,10 +49,8 @@ python3 -m unittest discover -s tests
 - **False-Positive Ceiling (`K4`)**: At most `5` false alarms out of `N = 400` normal control episodes (`<= 1.25%`, exact Clopper-Pearson two-sided 95% upper bound `2.8928% < 5%`).
 - **License**: `Apache-2.0` (see `LICENSE`).
 
-## 5. Post-Clock-A Q3 Track A Roadmap (Fail-Closed Local Staging)
+## 5. Track A Clean-Room MVP & Pre-Evaluation Protocol
 
-All public OSS repository creation, external code releases, and live `gyeol_bench/*.py` feature expansions remain frozen fail-closed pending written legal advice from an OMARA-registered migration agent (RMA) or Australian immigration lawyer under Subclass `482` Condition `8607` (legacy ref `8107`) and *Migration Regulations 1994* `reg 1.03` (Clock A Question 3). Upon positive written legal advice, **Track A** (clean-room `Gyeol-Bench` MVP, fully decoupled from internal repository maintenance) executes:
-
-1. **5-Factor `Condition A..E` & 4-Way Error Split (`<= 150` LoC Pure Stdlib Cap)**: Expand the single-function pure Python stdlib pipeline (`Condition A` baseline calculation, `Condition B` single premise retraction, `Condition C` `>= 3`-hop numerical dependency re-propagation, `Condition D` simultaneous retraction + SI/scale shift, and `Condition E` unrelated conclusion preservation) + `response_adapter` within a strict `<= 150` LoC net growth cap, scoring four orthogonal error modes: `PARSE_REJECT`, conditional arithmetic error (`Reasoning Accuracy | Valid Envelope`), `Stale-State Retention`, and `Over-Retraction`.
-2. **External `SymPy + Pint` Cross-Oracle Verification**: Run an out-of-repo `SymPy + Pint` symbolic rational and dimensional cross-oracle across all `800` generated episodes to verify mechanical ground-truth equivalence independently of `ExactRationalOracle`.
+1. **5-Factor `Condition A..E` & 4-Way Error Split (`<= 150` LoC Pure Stdlib Cap)**: Implemented as a pure Python stdlib single-function pipeline (`Condition A` baseline calculation, `Condition B` single premise retraction, `Condition C` `>= 3`-hop numerical dependency re-propagation, `Condition D` simultaneous retraction + SI/scale shift, and `Condition E` unrelated `d_indep` preservation) + `response_adapter`, scoring four orthogonal error modes: `PARSE_REJECT`, `CONDITIONAL_ARITH_ERROR`, `STALE_STATE_RETENTION`, and `OVER_RETRACTION`.
+2. **External `SymPy + Pint` Cross-Oracle Verification**: Verified via an out-of-repo `SymPy + Pint` symbolic rational and dimensional cross-oracle across all `800 / 800` generated episodes (`0` mismatches against `ExactRationalOracle`).
 3. **Pre-Day-46 External Researcher `N >= 150` Human Audit**: Pre-recruit `2` to `3` independent AI safety / `Inspect AI` evaluation researchers prior to Day `46` to complete stratified manual verification (`N >= 150`, targeting `0` oracle errors for the `1.9773%` one-sided 95% upper bound) ahead of full `N = 800` `K2`..`K4` evaluation.

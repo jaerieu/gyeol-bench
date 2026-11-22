@@ -18,7 +18,7 @@ from .oracle import (
 try:
     from inspect_ai import Task, task
     from inspect_ai.dataset import MemoryDataset, Sample
-    from inspect_ai.scorer import CORRECT, INCORRECT, Score, Target, accuracy, scorer, stderr
+    from inspect_ai.scorer import CORRECT, INCORRECT, Metric, SampleScore, Score, Target, Value, accuracy, grouped, metric, scorer, stderr
     from inspect_ai.solver import TaskState, generate
 
     _INSPECT_AVAILABLE = True
@@ -29,15 +29,9 @@ except ImportError:  # pragma: no cover - clean stdlib fallback when inspect_ai 
 def _serialize_turns(turns: Any) -> List[Dict[str, Any]]:
     return [
         {
-            "node_id": t.node_id,
-            "kind": t.kind,
-            "value": t.value,
-            "unit": t.unit,
-            "retraction_op": t.retraction_op,
-            "target_id": t.target_id,
-            "arith_op": t.arith_op,
-            "left_id": t.left_id,
-            "right_id": t.right_id,
+            "node_id": t.node_id, "kind": t.kind, "value": t.value, "unit": t.unit,
+            "retraction_op": t.retraction_op, "target_id": t.target_id,
+            "arith_op": t.arith_op, "left_id": t.left_id, "right_id": t.right_id,
         }
         for t in turns
     ]
@@ -49,24 +43,41 @@ def _deserialize_turns(items: List[Dict[str, Any]]) -> List[TurnSpec]:
 
 if _INSPECT_AVAILABLE:
 
-    @scorer(metrics=[accuracy(), stderr()])
+    @metric
+    def error_split_metrics() -> Metric:
+        def calc(scores: List[SampleScore]) -> Value:
+            n = len(scores)
+            if not n:
+                return {}
+            verdicts = [(s.score.metadata or {}).get("verdict", "") for s in scores]
+            valid = sum(1 for v in verdicts if v != "PARSE_REJECT")
+            return {
+                "conditional_accuracy": sum(1 for v in verdicts if v == "PASS") / valid if valid else 0.0,
+                "PARSE_REJECT": sum(1 for v in verdicts if v == "PARSE_REJECT") / n,
+                "CONDITIONAL_ARITH_ERROR": sum(1 for v in verdicts if v == "CONDITIONAL_ARITH_ERROR") / n,
+                "STALE_STATE_RETENTION": sum(1 for v in verdicts if v == "STALE_STATE_RETENTION") / n,
+                "OVER_RETRACTION": sum(1 for v in verdicts if v == "OVER_RETRACTION") / n,
+            }
+        return calc
+
+    @scorer(metrics=[accuracy(), stderr(), grouped(accuracy(), "condition"), error_split_metrics()])
     def retraction_dag_scorer() -> Any:
         async def score(state: TaskState, target: Target) -> Score:
             meta = state.metadata or {}
-            turns = _deserialize_turns(meta["turns"])
             res = evaluate_retraction_episode(
-                turns=turns,
+                turns=_deserialize_turns(meta["turns"]),
                 raw_model_output=state.output.completion if state.output else "",
                 target_node_id=meta["target_node_id"],
                 expected_unit=meta["expected_unit"],
+                preserved_targets=meta.get("preserved_targets") or None,
             )
             return Score(
                 value=CORRECT if res.ok else INCORRECT,
                 answer=state.output.completion if state.output else "",
                 explanation=res.verdict if res.ok else f"{res.verdict}: {res.reason}",
-                metadata={"verdict": res.verdict, "category": meta.get("category", "")},
+                reason="invalid_response_format" if res.verdict == "PARSE_REJECT" else None,
+                metadata={"verdict": res.verdict, "condition": meta.get("condition", ""), "category": meta.get("category", "")},
             )
-
         return score
 
     @task
@@ -76,19 +87,20 @@ if _INSPECT_AVAILABLE:
             Sample(
                 id=ep.episode_id,
                 input=ep.prompt,
-                target=json.dumps(
-                    {
-                        "step_id": ep.target_node_id,
-                        "value": ep.expected_value_float,
-                        "unit": ep.expected_unit,
-                        "retracted_ids": list(ep.expected_retracted_ids),
-                    }
-                ),
+                target=json.dumps({
+                    "step_id": ep.target_node_id,
+                    "value": ep.expected_value_float,
+                    "unit": ep.expected_unit,
+                    "retracted_ids": list(ep.expected_retracted_ids),
+                    **({"preserved": {k: {"unit": u} for k, u in ep.preserved_targets}} if ep.preserved_targets else {}),
+                }),
                 metadata={
+                    "condition": ep.condition,
                     "category": ep.category,
                     "turns": _serialize_turns(ep.turns),
                     "target_node_id": ep.target_node_id,
                     "expected_unit": ep.expected_unit,
+                    "preserved_targets": dict(ep.preserved_targets),
                 },
             )
             for ep in episodes
@@ -104,16 +116,15 @@ else:
     def retraction_dag(seed: int = 20261122, sample_count: int = 800) -> Dict[str, Any]:
         """Pure-stdlib task specification descriptor when inspect_ai is not installed locally."""
         episodes = generate_procedural_dataset(seed=seed, count=sample_count)
+        conds = {c: sum(1 for e in episodes if e.condition == c) for c in ("A", "B", "C", "D", "E")}
         return {
             "name": "gyeol_bench/retraction_dag",
+            "registry_spec_date": "2026-05-08",
             "inspect_ai_installed": False,
             "seed": seed,
             "sample_count": len(episodes),
-            "categories": {
-                "retraction": sum(1 for e in episodes if e.category == "retraction"),
-                "unit_scale": sum(1 for e in episodes if e.category == "unit_scale"),
-                "normal": sum(1 for e in episodes if e.category == "normal"),
-            },
+            "conditions": conds,
+            "categories": {"normal": conds["A"], "perturbed": len(episodes) - conds["A"]},
         }
 
 

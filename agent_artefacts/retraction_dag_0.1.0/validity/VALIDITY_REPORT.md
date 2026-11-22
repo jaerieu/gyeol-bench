@@ -1,7 +1,7 @@
 # Validity Report: `gyeol_bench/retraction_dag` (`0.1.0`)
 
 - **Registry Standard**: `UK AISI Inspect Evals` (`2026-05-08`)
-- **Governance Tier**: `[주의]` (Pre-launch local staging template; public OSS release and post-Q3 generator expansion remain gated fail-closed pending written legal advice from an OMARA-registered migration agent (RMA) or Australian immigration lawyer under Subclass `482` Condition `8607` (legacy ref `8107`) and *Migration Regulations 1994* `reg 1.03`)
+- **Governance Tier**: `[안전]` (Clean-room `Apache-2.0` Track A MVP; `Condition A..E` + `response_adapter` + 4-way error split + `800/800` external `SymPy + Pint` cross-oracle verified; `0` private core symbols)
 
 ## 1. Construct Validity, `Condition A..E` Design & 4-Way Error Taxonomy
 
@@ -9,7 +9,7 @@
 
 ### Factorial Episode Conditions (`Condition A..E`)
 
-While local `0.1.0` stages the 3-way baseline split (`200` retraction + `200` unit/scale + `400` normal control), the full Track A single-function pure stdlib expansion (`<= 150` LoC cap, post-Clock-A Q3 legal advice) formalizes five factorial conditions across paired episode seeds:
+`gyeol_bench/oracle.py` implements the five balanced factorial conditions (`N = 800`: `400` `Condition A` normal controls + `100` each for `Condition B..E`, paired deterministic seeds):
 
 - **`Condition A` (Baseline Calculation Control)**: Multi-step exact arithmetic with zero premise retractions and zero cross-scale shifts (serves simultaneously as the `K4` `N = 400` normal control specificity benchmark).
 - **`Condition B` (Single Premise Retraction)**: Mid-horizon `fix->`, `err->`, or `sup->` value override within a fixed unit scale.
@@ -37,7 +37,7 @@ Oracle verification strictly separates **automated symbolic cross-checking** fro
 
 ## 3. Pre-Registered Statistical Thresholds
 
-- **Sample Balance & Pairing**: `N = 800` (`200` retraction + `200` unit/scale + `400` unperturbed control) evaluated on identical seeds and identical JSON `response_adapter` envelopes comparing Standard Prompting Baseline against Lineage-Guided / Verifier-Assisted execution.
+- **Sample Balance & Pairing**: `N = 800` (`400` `Condition A` unperturbed control + `100` `Condition B` single retraction + `100` `Condition C` `>= 3`-hop cascade + `100` `Condition D` retraction + scale shift + `100` `Condition E` retraction + `d_indep` preservation) evaluated on identical seeds and identical JSON `response_adapter` envelopes comparing Standard Prompting Baseline against Lineage-Guided / Verifier-Assisted execution.
 - **Paired Superiority (`K2`)**: `(b - c) / 800 >= +0.05` (`b - c >= 40`) and two-sided exact McNemar p < 0.05 (requires b + c <= 396 at the b - c = 40 boundary).
 - **Human Audit Bound**: `0` oracle errors in independent `N >= 150` stratified human audit yields `1.9773%` (`1 - 0.05^(1/150)`, `1.98%`) one-sided 95% upper bound, reported separately from automated `SymPy + Pint` `800 / 800` cross-oracle agreement.
 - **Control Specificity (`K4`)**: `<= 5 / 400` false rejections (`2.8928%` two-sided 95% Clopper-Pearson upper bound `< 5%`).

@@ -162,16 +162,19 @@ def audit_directory(root_dir: Path, allow_remotes: bool = False) -> Dict[str, An
                 if re.search(pat, text, flags=flags):
                     violations.append(f"{rel_str}: {label}")
 
-    if not allow_remotes and (root / ".git").exists():
+    if (root / ".git").exists():
         proc = subprocess.run(
-            ["git", "-C", str(root), "remote"],
+            ["git", "-C", str(root), "remote", "-v"],
             capture_output=True,
             text=True,
             check=False,
         )
-        remotes = [ln.strip() for ln in proc.stdout.splitlines() if ln.strip()]
-        if remotes:
-            violations.append(f".git/config: unexpected remotes configured before Clock A: {remotes}")
+        remote_lines = [ln.strip() for ln in proc.stdout.splitlines() if ln.strip()]
+        for ln in remote_lines:
+            if re.search(r"(?:jaerieu/gyeol|gyeol_public)(?:\.git)?(?:\s|$)", ln, re.IGNORECASE):
+                violations.append(f".git/config: forbidden private/public-core remote configured: {ln}")
+            elif not allow_remotes and not re.search(r"jaerieu/gyeol-bench(?:\.git)?(?:\s|$)", ln, re.IGNORECASE):
+                violations.append(f".git/config: unexpected remote configured: {ln}")
 
     ok = len(violations) == 0 and scanned_files > 0
     return {

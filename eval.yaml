@@ -12,11 +12,20 @@ tasks:
     dataset_samples: 800
     human_baseline: 0.9802
 metadata:
-  perturbation_retraction_samples: 200
-  perturbation_unit_scale_samples: 200
+  condition_a_control_samples: 400
+  condition_b_retraction_samples: 100
+  condition_c_multihop_samples: 100
+  condition_d_unit_scale_samples: 100
+  condition_e_preservation_samples: 100
   normal_control_samples: 400
+  perturbed_samples: 400
   oracle: "pure_python_fractions_fraction"
   mixed_tolerance_abs: 0.0001
   mixed_tolerance_rel: 0.00001
-  envelope_gate: "PARSE_REJECT"
+  envelope_gate: "response_adapter -> PARSE_REJECT"
+  error_split:
+    - "PARSE_REJECT"
+    - "CONDITIONAL_ARITH_ERROR"
+    - "STALE_STATE_RETENTION"
+    - "OVER_RETRACTION"
   governance_tier: "[안전]"

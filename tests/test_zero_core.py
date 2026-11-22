@@ -22,6 +22,7 @@ from gyeol_bench import (
     generate_procedural_dataset,
     mixed_tolerance_match,
     parse_step_envelope,
+    response_adapter,
 )
 from gyeol_bench._registry import retraction_dag
 
@@ -104,7 +105,7 @@ class TestZeroCoreAndOracle(unittest.TestCase):
         self.assertTrue(res_mg.ok)
         self.assertEqual(res_mg.verdict, "PASS")
 
-        # Stale un-retracted value (2.5 g * 3 = 7.5 g) must fail
+        # Stale un-retracted value (2.5 g * 3 = 7.5 g) -> STALE_STATE_RETENTION
         stale_json = json.dumps(
             {
                 "step_id": "d2",
@@ -115,7 +116,15 @@ class TestZeroCoreAndOracle(unittest.TestCase):
         )
         res_stale = evaluate_retraction_episode(turns, stale_json, target_node_id="d2", expected_unit="g")
         self.assertFalse(res_stale.ok)
-        self.assertEqual(res_stale.verdict, "VALUE_MISMATCH")
+        self.assertEqual(res_stale.verdict, "STALE_STATE_RETENTION")
+
+        # Arbitrary wrong numeric value -> CONDITIONAL_ARITH_ERROR
+        bad_arith_json = json.dumps(
+            {"step_id": "d2", "value": 9.25, "unit": "g", "retracted_ids": ["p1"]}
+        )
+        res_arith = evaluate_retraction_episode(turns, bad_arith_json, target_node_id="d2", expected_unit="g")
+        self.assertFalse(res_arith.ok)
+        self.assertEqual(res_arith.verdict, "CONDITIONAL_ARITH_ERROR")
 
     def test_financial_scale_vs_meter_disambiguation(self) -> None:
         oracle = ExactRationalOracle()
@@ -131,10 +140,12 @@ class TestZeroCoreAndOracle(unittest.TestCase):
             '{"step_id": "d2", "value": true, "unit": "g", "retracted_ids": []}',
             '{"step_id": "d2", "value": NaN, "unit": "g", "retracted_ids": []}',
             '{"step_id": "d2", "value": 10.5}',
+            '{"step_id": "d2", "value": 10.5, "unit": "g", "retracted_ids": [], "preserved": "bad"}',
         ]:
-            parsed = parse_step_envelope(bad_raw)
-            self.assertFalse(parsed.ok, msg=f"Expected PARSE_REJECT for {bad_raw!r}")
-            self.assertEqual(parsed.status, "PARSE_REJECT")
+            for gate in (parse_step_envelope, response_adapter):
+                parsed = gate(bad_raw)
+                self.assertFalse(parsed.ok, msg=f"Expected PARSE_REJECT for {bad_raw!r}")
+                self.assertEqual(parsed.status, "PARSE_REJECT")
 
         # Truth = 1000.0 -> allowed = 1e-4 + 1e-5 * 1000.0 = 0.0101
         ok_in, _, _ = mixed_tolerance_match("1000.0100", Fraction(1000, 1))
@@ -142,15 +153,62 @@ class TestZeroCoreAndOracle(unittest.TestCase):
         self.assertTrue(ok_in)
         self.assertFalse(ok_out)
 
-    def test_procedural_dataset_and_registry_entry(self) -> None:
-        ds = generate_procedural_dataset(seed=20261122, count=40)
-        self.assertEqual(len(ds), 40)
-        self.assertEqual(sum(1 for e in ds if e.category == "retraction"), 10)
-        self.assertEqual(sum(1 for e in ds if e.category == "unit_scale"), 10)
-        self.assertEqual(sum(1 for e in ds if e.category == "normal"), 20)
+    def test_n800_five_conditions_and_four_way_error_split(self) -> None:
+        ds = generate_procedural_dataset(seed=20261122, count=800)
+        self.assertEqual(len(ds), 800)
+        self.assertEqual(sum(1 for e in ds if e.category == "normal"), 400)
+        self.assertEqual(sum(1 for e in ds if e.category == "perturbed"), 400)
+        for cond, expected_n in [("A", 400), ("B", 100), ("C", 100), ("D", 100), ("E", 100)]:
+            self.assertEqual(sum(1 for e in ds if e.condition == cond), expected_n)
 
-        task_obj = retraction_dag(seed=20261122, sample_count=20)
+        by_cond = {cond: next(e for e in ds if e.condition == cond) for cond in ("A", "B", "C", "D", "E")}
+
+        def _score(ep, value, retracted_ids, preserved=None, unit=None):
+            body = {"step_id": ep.target_node_id, "value": value, "unit": unit or ep.expected_unit, "retracted_ids": retracted_ids}
+            if preserved is not None:
+                body["preserved"] = preserved
+            return evaluate_retraction_episode(
+                ep.turns, json.dumps(body), ep.target_node_id, ep.expected_unit,
+                preserved_targets=dict(ep.preserved_targets) or None,
+            )
+
+        ep_a = by_cond["A"]
+        self.assertEqual(_score(ep_a, ep_a.expected_value_float, []).verdict, "PASS")
+        self.assertEqual(_score(ep_a, ep_a.expected_value_float + 5, []).verdict, "CONDITIONAL_ARITH_ERROR")
+        self.assertEqual(_score(ep_a, ep_a.expected_value_float, ["p1"]).verdict, "OVER_RETRACTION")
+
+        self.assertEqual(by_cond["C"].target_node_id, "d3")
+        for cond in ("B", "C", "D"):
+            ep = by_cond[cond]
+            self.assertEqual(_score(ep, ep.expected_value_float, list(ep.expected_retracted_ids)).verdict, "PASS")
+            self.assertEqual(_score(ep, ep.pre_retraction_value_float, []).verdict, "STALE_STATE_RETENTION")
+
+        ep_e = by_cond["E"]
+        pres_map = dict(ep_e.preserved_targets)
+        self.assertIn("d_indep", pres_map)
+        oracle_e = ExactRationalOracle()
+        for t in ep_e.turns:
+            oracle_e.append_turn(t)
+        indep_base, _, _ = oracle_e.evaluate().active_values_base["d_indep"]
+        from gyeol_bench.oracle import UNIT_TABLE
+        iu = pres_map["d_indep"]
+        iv = float(indep_base / UNIT_TABLE[iu][1])
+
+        self.assertEqual(_score(ep_e, ep_e.expected_value_float, ["p1"], {"d_indep": {"value": iv, "unit": iu}}).verdict, "PASS")
+        self.assertEqual(_score(ep_e, ep_e.expected_value_float, ["p1"], {"d_indep": {"value": iv + 10.0, "unit": iu}}).verdict, "OVER_RETRACTION")
+        self.assertEqual(_score(ep_e, ep_e.expected_value_float, ["p1", "d_indep"], {"d_indep": {"value": iv, "unit": iu}}).verdict, "OVER_RETRACTION")
+        self.assertEqual(_score(ep_e, ep_e.expected_value_float, ["p1"]).verdict, "PARSE_REJECT")
+
+    def test_retraction_dag_registration_balance(self) -> None:
+        task_obj = retraction_dag(seed=20261122, sample_count=16)
         self.assertIsNotNone(task_obj)
+        if isinstance(task_obj, dict):
+            self.assertEqual(task_obj["sample_count"], 16)
+            self.assertEqual(task_obj["conditions"], {"A": 8, "B": 2, "C": 2, "D": 2, "E": 2})
+        else:
+            self.assertEqual(len(task_obj.dataset), 16)
+            for cond, exp_n in [("A", 8), ("B", 2), ("C", 2), ("D", 2), ("E", 2)]:
+                self.assertEqual(sum(1 for s in task_obj.dataset if (s.metadata or {}).get("condition") == cond), exp_n)
 
 
 if __name__ == "__main__":
