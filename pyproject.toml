@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools >= 68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gyeol-bench"
+version = "0.1.0"
+description = "Clean-room long-horizon quantitative premise retraction and SI unit/scale cascade evaluation benchmark for UK AISI Inspect AI."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.11"
+authors = [{ name = "Jae" }]
+keywords = ["ai-safety", "evaluation", "inspect-ai", "premise-retraction", "si-units", "benchmark"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+dependencies = ["inspect_ai >= 0.3.0"]
+
+[project.entry-points."inspect_ai"]
+gyeol_bench = "gyeol_bench._registry"
+
+[tool.setuptools.packages.find]
+include = ["gyeol_bench*"]

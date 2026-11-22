@@ -1,0 +1,22 @@
+title: "Gyeol-Bench: Multi-Turn Quantitative Premise Retraction & SI Unit Cascade"
+description: "Evaluates whether long-horizon AI agents accurately retract superseded premises (fix->, err->, sup->) and re-propagate exact rational arithmetic across SI units and financial K/M/B scales."
+arxiv: ""
+group: "Reasoning"
+contributors:
+  - "jaerieu"
+version: "0.1.0"
+registry_spec_date: "2026-05-08"
+license: "Apache-2.0"
+tasks:
+  - name: "gyeol_bench/retraction_dag"
+    dataset_samples: 800
+    human_baseline: 0.9802
+metadata:
+  perturbation_retraction_samples: 200
+  perturbation_unit_scale_samples: 200
+  normal_control_samples: 400
+  oracle: "pure_python_fractions_fraction"
+  mixed_tolerance_abs: 0.0001
+  mixed_tolerance_rel: 0.00001
+  envelope_gate: "PARSE_REJECT"
+  governance_tier: "[안전]"
