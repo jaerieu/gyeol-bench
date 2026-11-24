@@ -1,0 +1,1527 @@
+{
+  "schema_version": "1.0.0",
+  "benchmark_package": "gyeol-bench",
+  "primary_task": "gyeol_bench/retraction_dag_multiturn",
+  "control_experiment": "p2_qwen38_27b_high_capacity_saturation_and_quantization_control",
+  "governance_grade": "[안전]",
+  "status": "deferred_colab_80gb_503_stockout",
+  "n100_expansion_status": {
+    "status": "deferred_colab_80gb_503_stockout",
+    "target_seed": 20261122,
+    "target_sample_size": 100,
+    "reason": "Colab Pro+ backend returned HTTP 503 Service Unavailable across all >=80GB and fallback GPU pools (A100, H100, G4) during Wave 2 and post-P1 probes on 2026-11-24. Zero compute units were burned during 503 retries; balance remains 3132.29 / 3251.14 CU (118.85 CU spent = 3.66%, Active assignments: 0)."
+  },
+  "bf16_a100_n50_control": {
+    "hardware": "NVIDIA A100-SXM4-80GB",
+    "seed": 20261151,
+    "sampleSize": 50,
+    "episodesPath": "/tmp/gyeol-colab-checkpoints/arm3-k2-n50/qwen38-27b-s20261151-n50-episodes.jsonl",
+    "episodesSha256": "9978c68dbf49fbfe3f6b4d9170473bf3533f36763662c2b8af7020cb893f85c8",
+    "summaryPath": "/tmp/gyeol-colab-checkpoints/arm3-k2-n50/qwen38-27b-s20261151-n50-summary.json",
+    "summarySha256": "c315d0b2bc73c38f7d35e2305f5116fa40e9eb7cc00a43e63a5cc97b7414ebed",
+    "loadSec": 28.12,
+    "wallSec": 1058.624,
+    "peakVramReservedGb": 50.098,
+    "k3SaturationFinding": "Baseline Arm 1 achieves 47/50 (94.0% ITT, 6.0% failure rate < 10.0% K3 threshold) with 0/50 STALE_STATE_RETENTION, 0/50 OVER_RETRACTION, 0/25 Condition A failures, and 3/50 CONDITIONAL_ARITH_ERROR. All Primary K2 Arm 3 variants (arm3a_prompt_raw, arm3a_structural_only, arm3b_structural_gate, arm3b_llm_repair) preserve exact 47/50 (94.0%, McNemar b=0, c=0, p=1.0) with 0/25 Condition A false alarms.",
+    "analysis": {
+      "modelKey": "qwen38",
+      "repoId": "Qwen/Qwen3.8-27B",
+      "dtype": "bf16",
+      "episodesPath": "/tmp/gyeol-colab-checkpoints/arm3-k2-n50/qwen38-27b-s20261151-n50-episodes.jsonl",
+      "episodesSha256": "9978c68dbf49fbfe3f6b4d9170473bf3533f36763662c2b8af7020cb893f85c8",
+      "sampleSize": 50,
+      "turn1Shared": {
+        "cleanCount": 44,
+        "cleanRate": 0.88,
+        "verdictCounts": {
+          "PASS": 44,
+          "PARSE_REJECT": 1,
+          "CONDITIONAL_ARITH_ERROR": 5,
+          "STALE_STATE_RETENTION": 0,
+          "OVER_RETRACTION": 0
+        }
+      },
+      "ittPrimary": {
+        "n": 50,
+        "arm1Baseline": {
+          "n": 50,
+          "passCount": 47,
+          "failCount": 3,
+          "accuracy": 0.94,
+          "failureRate": 0.06,
+          "condATotal": 25,
+          "condAPassCount": 25,
+          "condAFailCount": 0,
+          "condAFailRate": 0.0,
+          "condAK4MaxAllowedFailures": 0,
+          "condAK4Pass": true,
+          "condBETotal": 25,
+          "condBEPassCount": 22,
+          "condBEFailCount": 3,
+          "condBEAccuracy": 0.88,
+          "verdictCounts": {
+            "PASS": 47,
+            "PARSE_REJECT": 0,
+            "CONDITIONAL_ARITH_ERROR": 3,
+            "STALE_STATE_RETENTION": 0,
+            "OVER_RETRACTION": 0
+          },
+          "stalePlusOverCount": 0,
+          "perCondition": {
+            "A": {
+              "n": 25,
+              "pass": 25,
+              "fail": 0,
+              "accuracy": 1.0,
+              "verdicts": {
+                "PASS": 25,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "B": {
+              "n": 7,
+              "pass": 7,
+              "fail": 0,
+              "accuracy": 1.0,
+              "verdicts": {
+                "PASS": 7,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "C": {
+              "n": 6,
+              "pass": 6,
+              "fail": 0,
+              "accuracy": 1.0,
+              "verdicts": {
+                "PASS": 6,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "D": {
+              "n": 6,
+              "pass": 3,
+              "fail": 3,
+              "accuracy": 0.5,
+              "verdicts": {
+                "PASS": 3,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 3,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "E": {
+              "n": 6,
+              "pass": 6,
+              "fail": 0,
+              "accuracy": 1.0,
+              "verdicts": {
+                "PASS": 6,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            }
+          }
+        },
+        "primaryK2Contenders": {
+          "arm3a_prompt_raw": {
+            "summary": {
+              "n": 50,
+              "passCount": 47,
+              "failCount": 3,
+              "accuracy": 0.94,
+              "failureRate": 0.06,
+              "condATotal": 25,
+              "condAPassCount": 25,
+              "condAFailCount": 0,
+              "condAFailRate": 0.0,
+              "condAK4MaxAllowedFailures": 0,
+              "condAK4Pass": true,
+              "condBETotal": 25,
+              "condBEPassCount": 22,
+              "condBEFailCount": 3,
+              "condBEAccuracy": 0.88,
+              "verdictCounts": {
+                "PASS": 47,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 3,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              },
+              "stalePlusOverCount": 0,
+              "perCondition": {
+                "A": {
+                  "n": 25,
+                  "pass": 25,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 25,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "B": {
+                  "n": 7,
+                  "pass": 7,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 7,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "C": {
+                  "n": 6,
+                  "pass": 6,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 6,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "D": {
+                  "n": 6,
+                  "pass": 3,
+                  "fail": 3,
+                  "accuracy": 0.5,
+                  "verdicts": {
+                    "PASS": 3,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 3,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "E": {
+                  "n": 6,
+                  "pass": 6,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 6,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                }
+              }
+            },
+            "stalePlusOverDeltaContenderMinusArm1": 0,
+            "mcnemar": {
+              "aBothPass": 47,
+              "bArm1FailContenderPass": 0,
+              "cArm1PassContenderFail": 0,
+              "dBothFail": 3,
+              "bMinusC": 0,
+              "bPlusC": 0,
+              "netGainOverN": 0.0,
+              "requiredBMinusCForK2": 3,
+              "twoSidedExactP": 1.0,
+              "holmBonferroniAdjustedP": 1.0,
+              "k2RawGatePass": false,
+              "k2HolmGatePass": false,
+              "beOnlyB": 0,
+              "beOnlyC": 0,
+              "beOnlyBMinusC": 0,
+              "beOnlyTwoSidedExactP": 1.0
+            },
+            "is_primary_k2_eligible": true,
+            "audit19_disclosures": {
+              "repair_triggered_count": 0,
+              "repair_triggered_rate": 0.0,
+              "extra_inference_turns": 0,
+              "pass1_flag_counts": {},
+              "diagnostic_oracle_trigger_disclosure": "Zero extra inference turns and zero numeric state-diff trigger."
+            }
+          },
+          "arm3a_structural_only": {
+            "summary": {
+              "n": 50,
+              "passCount": 47,
+              "failCount": 3,
+              "accuracy": 0.94,
+              "failureRate": 0.06,
+              "condATotal": 25,
+              "condAPassCount": 25,
+              "condAFailCount": 0,
+              "condAFailRate": 0.0,
+              "condAK4MaxAllowedFailures": 0,
+              "condAK4Pass": true,
+              "condBETotal": 25,
+              "condBEPassCount": 22,
+              "condBEFailCount": 3,
+              "condBEAccuracy": 0.88,
+              "verdictCounts": {
+                "PASS": 47,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 3,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              },
+              "stalePlusOverCount": 0,
+              "perCondition": {
+                "A": {
+                  "n": 25,
+                  "pass": 25,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 25,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "B": {
+                  "n": 7,
+                  "pass": 7,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 7,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "C": {
+                  "n": 6,
+                  "pass": 6,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 6,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "D": {
+                  "n": 6,
+                  "pass": 3,
+                  "fail": 3,
+                  "accuracy": 0.5,
+                  "verdicts": {
+                    "PASS": 3,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 3,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "E": {
+                  "n": 6,
+                  "pass": 6,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 6,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                }
+              }
+            },
+            "stalePlusOverDeltaContenderMinusArm1": 0,
+            "mcnemar": {
+              "aBothPass": 47,
+              "bArm1FailContenderPass": 0,
+              "cArm1PassContenderFail": 0,
+              "dBothFail": 3,
+              "bMinusC": 0,
+              "bPlusC": 0,
+              "netGainOverN": 0.0,
+              "requiredBMinusCForK2": 3,
+              "twoSidedExactP": 1.0,
+              "holmBonferroniAdjustedP": 1.0,
+              "k2RawGatePass": false,
+              "k2HolmGatePass": false,
+              "beOnlyB": 0,
+              "beOnlyC": 0,
+              "beOnlyBMinusC": 0,
+              "beOnlyTwoSidedExactP": 1.0
+            },
+            "is_primary_k2_eligible": true,
+            "audit19_disclosures": {
+              "repair_triggered_count": 0,
+              "repair_triggered_rate": 0.0,
+              "extra_inference_turns": 0,
+              "pass1_flag_counts": {},
+              "diagnostic_oracle_trigger_disclosure": "Zero extra inference turns and zero numeric state-diff trigger."
+            }
+          },
+          "arm3b_structural_gate": {
+            "summary": {
+              "n": 50,
+              "passCount": 47,
+              "failCount": 3,
+              "accuracy": 0.94,
+              "failureRate": 0.06,
+              "condATotal": 25,
+              "condAPassCount": 25,
+              "condAFailCount": 0,
+              "condAFailRate": 0.0,
+              "condAK4MaxAllowedFailures": 0,
+              "condAK4Pass": true,
+              "condBETotal": 25,
+              "condBEPassCount": 22,
+              "condBEFailCount": 3,
+              "condBEAccuracy": 0.88,
+              "verdictCounts": {
+                "PASS": 47,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 3,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              },
+              "stalePlusOverCount": 0,
+              "perCondition": {
+                "A": {
+                  "n": 25,
+                  "pass": 25,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 25,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "B": {
+                  "n": 7,
+                  "pass": 7,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 7,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "C": {
+                  "n": 6,
+                  "pass": 6,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 6,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "D": {
+                  "n": 6,
+                  "pass": 3,
+                  "fail": 3,
+                  "accuracy": 0.5,
+                  "verdicts": {
+                    "PASS": 3,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 3,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "E": {
+                  "n": 6,
+                  "pass": 6,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 6,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                }
+              }
+            },
+            "stalePlusOverDeltaContenderMinusArm1": 0,
+            "mcnemar": {
+              "aBothPass": 47,
+              "bArm1FailContenderPass": 0,
+              "cArm1PassContenderFail": 0,
+              "dBothFail": 3,
+              "bMinusC": 0,
+              "bPlusC": 0,
+              "netGainOverN": 0.0,
+              "requiredBMinusCForK2": 3,
+              "twoSidedExactP": 1.0,
+              "holmBonferroniAdjustedP": 1.0,
+              "k2RawGatePass": false,
+              "k2HolmGatePass": false,
+              "beOnlyB": 0,
+              "beOnlyC": 0,
+              "beOnlyBMinusC": 0,
+              "beOnlyTwoSidedExactP": 1.0
+            },
+            "is_primary_k2_eligible": true,
+            "audit19_disclosures": {
+              "repair_triggered_count": 0,
+              "repair_triggered_rate": 0.0,
+              "extra_inference_turns": 0,
+              "pass1_flag_counts": {
+                "SI_ARITH_RESIDUAL_MISMATCH": 3
+              },
+              "diagnostic_oracle_trigger_disclosure": "Zero extra inference turns and zero numeric state-diff trigger."
+            }
+          },
+          "arm3b_llm_repair": {
+            "summary": {
+              "n": 50,
+              "passCount": 47,
+              "failCount": 3,
+              "accuracy": 0.94,
+              "failureRate": 0.06,
+              "condATotal": 25,
+              "condAPassCount": 25,
+              "condAFailCount": 0,
+              "condAFailRate": 0.0,
+              "condAK4MaxAllowedFailures": 0,
+              "condAK4Pass": true,
+              "condBETotal": 25,
+              "condBEPassCount": 22,
+              "condBEFailCount": 3,
+              "condBEAccuracy": 0.88,
+              "verdictCounts": {
+                "PASS": 47,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 3,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              },
+              "stalePlusOverCount": 0,
+              "perCondition": {
+                "A": {
+                  "n": 25,
+                  "pass": 25,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 25,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "B": {
+                  "n": 7,
+                  "pass": 7,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 7,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "C": {
+                  "n": 6,
+                  "pass": 6,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 6,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "D": {
+                  "n": 6,
+                  "pass": 3,
+                  "fail": 3,
+                  "accuracy": 0.5,
+                  "verdicts": {
+                    "PASS": 3,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 3,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "E": {
+                  "n": 6,
+                  "pass": 6,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 6,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                }
+              }
+            },
+            "stalePlusOverDeltaContenderMinusArm1": 0,
+            "mcnemar": {
+              "aBothPass": 47,
+              "bArm1FailContenderPass": 0,
+              "cArm1PassContenderFail": 0,
+              "dBothFail": 3,
+              "bMinusC": 0,
+              "bPlusC": 0,
+              "netGainOverN": 0.0,
+              "requiredBMinusCForK2": 3,
+              "twoSidedExactP": 1.0,
+              "holmBonferroniAdjustedP": 1.0,
+              "k2RawGatePass": false,
+              "k2HolmGatePass": false,
+              "beOnlyB": 0,
+              "beOnlyC": 0,
+              "beOnlyBMinusC": 0,
+              "beOnlyTwoSidedExactP": 1.0
+            },
+            "is_primary_k2_eligible": true,
+            "audit19_disclosures": {
+              "repair_triggered_count": 3,
+              "repair_triggered_rate": 0.06,
+              "extra_inference_turns": 3,
+              "pass1_flag_counts": {
+                "SI_ARITH_RESIDUAL_MISMATCH": 3
+              },
+              "diagnostic_oracle_trigger_disclosure": "Pass-1 trigger includes binary STALE_TURN1_BINDING / SI_ARITH_RESIDUAL_MISMATCH state-diff audit (with zero target numeric leakage in repair prompt); co-logged alongside 0-extra-turn structural_gate."
+            }
+          }
+        }
+      },
+      "cleanTurn1Sensitivity": {
+        "n": 44,
+        "arm1Baseline": {
+          "n": 44,
+          "passCount": 44,
+          "failCount": 0,
+          "accuracy": 1.0,
+          "failureRate": 0.0,
+          "condATotal": 25,
+          "condAPassCount": 25,
+          "condAFailCount": 0,
+          "condAFailRate": 0.0,
+          "condAK4MaxAllowedFailures": 0,
+          "condAK4Pass": true,
+          "condBETotal": 19,
+          "condBEPassCount": 19,
+          "condBEFailCount": 0,
+          "condBEAccuracy": 1.0,
+          "verdictCounts": {
+            "PASS": 44,
+            "PARSE_REJECT": 0,
+            "CONDITIONAL_ARITH_ERROR": 0,
+            "STALE_STATE_RETENTION": 0,
+            "OVER_RETRACTION": 0
+          },
+          "stalePlusOverCount": 0,
+          "perCondition": {
+            "A": {
+              "n": 25,
+              "pass": 25,
+              "fail": 0,
+              "accuracy": 1.0,
+              "verdicts": {
+                "PASS": 25,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "B": {
+              "n": 7,
+              "pass": 7,
+              "fail": 0,
+              "accuracy": 1.0,
+              "verdicts": {
+                "PASS": 7,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "C": {
+              "n": 6,
+              "pass": 6,
+              "fail": 0,
+              "accuracy": 1.0,
+              "verdicts": {
+                "PASS": 6,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "E": {
+              "n": 6,
+              "pass": 6,
+              "fail": 0,
+              "accuracy": 1.0,
+              "verdicts": {
+                "PASS": 6,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            }
+          }
+        },
+        "primaryK2Contenders": {
+          "arm3a_prompt_raw": {
+            "summary": {
+              "n": 44,
+              "passCount": 44,
+              "failCount": 0,
+              "accuracy": 1.0,
+              "failureRate": 0.0,
+              "condATotal": 25,
+              "condAPassCount": 25,
+              "condAFailCount": 0,
+              "condAFailRate": 0.0,
+              "condAK4MaxAllowedFailures": 0,
+              "condAK4Pass": true,
+              "condBETotal": 19,
+              "condBEPassCount": 19,
+              "condBEFailCount": 0,
+              "condBEAccuracy": 1.0,
+              "verdictCounts": {
+                "PASS": 44,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              },
+              "stalePlusOverCount": 0,
+              "perCondition": {
+                "A": {
+                  "n": 25,
+                  "pass": 25,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 25,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "B": {
+                  "n": 7,
+                  "pass": 7,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 7,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "C": {
+                  "n": 6,
+                  "pass": 6,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 6,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "E": {
+                  "n": 6,
+                  "pass": 6,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 6,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                }
+              }
+            },
+            "stalePlusOverDeltaContenderMinusArm1": 0,
+            "mcnemar": {
+              "aBothPass": 44,
+              "bArm1FailContenderPass": 0,
+              "cArm1PassContenderFail": 0,
+              "dBothFail": 0,
+              "bMinusC": 0,
+              "bPlusC": 0,
+              "netGainOverN": 0.0,
+              "requiredBMinusCForK2": 3,
+              "twoSidedExactP": 1.0,
+              "holmBonferroniAdjustedP": 1.0,
+              "k2RawGatePass": false,
+              "k2HolmGatePass": false,
+              "beOnlyB": 0,
+              "beOnlyC": 0,
+              "beOnlyBMinusC": 0,
+              "beOnlyTwoSidedExactP": 1.0
+            },
+            "is_primary_k2_eligible": true,
+            "audit19_disclosures": {
+              "repair_triggered_count": 0,
+              "repair_triggered_rate": 0.0,
+              "extra_inference_turns": 0,
+              "pass1_flag_counts": {},
+              "diagnostic_oracle_trigger_disclosure": "Zero extra inference turns and zero numeric state-diff trigger."
+            }
+          },
+          "arm3a_structural_only": {
+            "summary": {
+              "n": 44,
+              "passCount": 44,
+              "failCount": 0,
+              "accuracy": 1.0,
+              "failureRate": 0.0,
+              "condATotal": 25,
+              "condAPassCount": 25,
+              "condAFailCount": 0,
+              "condAFailRate": 0.0,
+              "condAK4MaxAllowedFailures": 0,
+              "condAK4Pass": true,
+              "condBETotal": 19,
+              "condBEPassCount": 19,
+              "condBEFailCount": 0,
+              "condBEAccuracy": 1.0,
+              "verdictCounts": {
+                "PASS": 44,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              },
+              "stalePlusOverCount": 0,
+              "perCondition": {
+                "A": {
+                  "n": 25,
+                  "pass": 25,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 25,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "B": {
+                  "n": 7,
+                  "pass": 7,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 7,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "C": {
+                  "n": 6,
+                  "pass": 6,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 6,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "E": {
+                  "n": 6,
+                  "pass": 6,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 6,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                }
+              }
+            },
+            "stalePlusOverDeltaContenderMinusArm1": 0,
+            "mcnemar": {
+              "aBothPass": 44,
+              "bArm1FailContenderPass": 0,
+              "cArm1PassContenderFail": 0,
+              "dBothFail": 0,
+              "bMinusC": 0,
+              "bPlusC": 0,
+              "netGainOverN": 0.0,
+              "requiredBMinusCForK2": 3,
+              "twoSidedExactP": 1.0,
+              "holmBonferroniAdjustedP": 1.0,
+              "k2RawGatePass": false,
+              "k2HolmGatePass": false,
+              "beOnlyB": 0,
+              "beOnlyC": 0,
+              "beOnlyBMinusC": 0,
+              "beOnlyTwoSidedExactP": 1.0
+            },
+            "is_primary_k2_eligible": true,
+            "audit19_disclosures": {
+              "repair_triggered_count": 0,
+              "repair_triggered_rate": 0.0,
+              "extra_inference_turns": 0,
+              "pass1_flag_counts": {},
+              "diagnostic_oracle_trigger_disclosure": "Zero extra inference turns and zero numeric state-diff trigger."
+            }
+          },
+          "arm3b_structural_gate": {
+            "summary": {
+              "n": 44,
+              "passCount": 44,
+              "failCount": 0,
+              "accuracy": 1.0,
+              "failureRate": 0.0,
+              "condATotal": 25,
+              "condAPassCount": 25,
+              "condAFailCount": 0,
+              "condAFailRate": 0.0,
+              "condAK4MaxAllowedFailures": 0,
+              "condAK4Pass": true,
+              "condBETotal": 19,
+              "condBEPassCount": 19,
+              "condBEFailCount": 0,
+              "condBEAccuracy": 1.0,
+              "verdictCounts": {
+                "PASS": 44,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              },
+              "stalePlusOverCount": 0,
+              "perCondition": {
+                "A": {
+                  "n": 25,
+                  "pass": 25,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 25,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "B": {
+                  "n": 7,
+                  "pass": 7,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 7,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "C": {
+                  "n": 6,
+                  "pass": 6,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 6,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "E": {
+                  "n": 6,
+                  "pass": 6,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 6,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                }
+              }
+            },
+            "stalePlusOverDeltaContenderMinusArm1": 0,
+            "mcnemar": {
+              "aBothPass": 44,
+              "bArm1FailContenderPass": 0,
+              "cArm1PassContenderFail": 0,
+              "dBothFail": 0,
+              "bMinusC": 0,
+              "bPlusC": 0,
+              "netGainOverN": 0.0,
+              "requiredBMinusCForK2": 3,
+              "twoSidedExactP": 1.0,
+              "holmBonferroniAdjustedP": 1.0,
+              "k2RawGatePass": false,
+              "k2HolmGatePass": false,
+              "beOnlyB": 0,
+              "beOnlyC": 0,
+              "beOnlyBMinusC": 0,
+              "beOnlyTwoSidedExactP": 1.0
+            },
+            "is_primary_k2_eligible": true,
+            "audit19_disclosures": {
+              "repair_triggered_count": 0,
+              "repair_triggered_rate": 0.0,
+              "extra_inference_turns": 0,
+              "pass1_flag_counts": {},
+              "diagnostic_oracle_trigger_disclosure": "Zero extra inference turns and zero numeric state-diff trigger."
+            }
+          },
+          "arm3b_llm_repair": {
+            "summary": {
+              "n": 44,
+              "passCount": 44,
+              "failCount": 0,
+              "accuracy": 1.0,
+              "failureRate": 0.0,
+              "condATotal": 25,
+              "condAPassCount": 25,
+              "condAFailCount": 0,
+              "condAFailRate": 0.0,
+              "condAK4MaxAllowedFailures": 0,
+              "condAK4Pass": true,
+              "condBETotal": 19,
+              "condBEPassCount": 19,
+              "condBEFailCount": 0,
+              "condBEAccuracy": 1.0,
+              "verdictCounts": {
+                "PASS": 44,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              },
+              "stalePlusOverCount": 0,
+              "perCondition": {
+                "A": {
+                  "n": 25,
+                  "pass": 25,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 25,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "B": {
+                  "n": 7,
+                  "pass": 7,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 7,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "C": {
+                  "n": 6,
+                  "pass": 6,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 6,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                },
+                "E": {
+                  "n": 6,
+                  "pass": 6,
+                  "fail": 0,
+                  "accuracy": 1.0,
+                  "verdicts": {
+                    "PASS": 6,
+                    "PARSE_REJECT": 0,
+                    "CONDITIONAL_ARITH_ERROR": 0,
+                    "STALE_STATE_RETENTION": 0,
+                    "OVER_RETRACTION": 0
+                  }
+                }
+              }
+            },
+            "stalePlusOverDeltaContenderMinusArm1": 0,
+            "mcnemar": {
+              "aBothPass": 44,
+              "bArm1FailContenderPass": 0,
+              "cArm1PassContenderFail": 0,
+              "dBothFail": 0,
+              "bMinusC": 0,
+              "bPlusC": 0,
+              "netGainOverN": 0.0,
+              "requiredBMinusCForK2": 3,
+              "twoSidedExactP": 1.0,
+              "holmBonferroniAdjustedP": 1.0,
+              "k2RawGatePass": false,
+              "k2HolmGatePass": false,
+              "beOnlyB": 0,
+              "beOnlyC": 0,
+              "beOnlyBMinusC": 0,
+              "beOnlyTwoSidedExactP": 1.0
+            },
+            "is_primary_k2_eligible": true,
+            "audit19_disclosures": {
+              "repair_triggered_count": 0,
+              "repair_triggered_rate": 0.0,
+              "extra_inference_turns": 0,
+              "pass1_flag_counts": {},
+              "diagnostic_oracle_trigger_disclosure": "Pass-1 trigger includes binary STALE_TURN1_BINDING / SI_ARITH_RESIDUAL_MISMATCH state-diff audit (with zero target numeric leakage in repair prompt); co-logged alongside 0-extra-turn structural_gate."
+            }
+          }
+        }
+      },
+      "secondary_symbolic_ceilings": {
+        "is_primary_k2_eligible": false,
+        "disclosure": "Symbolic-offload ceilings overwrite Turn-2 target numeric values with exact Fraction/SI DAG evaluation and are strictly excluded from primary K2 LLM belief-revision claims.",
+        "itt": {
+          "arm3a_full_ceiling": {
+            "n": 50,
+            "passCount": 50,
+            "failCount": 0,
+            "accuracy": 1.0,
+            "failureRate": 0.0,
+            "condATotal": 25,
+            "condAPassCount": 25,
+            "condAFailCount": 0,
+            "condAFailRate": 0.0,
+            "condAK4MaxAllowedFailures": 0,
+            "condAK4Pass": true,
+            "condBETotal": 25,
+            "condBEPassCount": 25,
+            "condBEFailCount": 0,
+            "condBEAccuracy": 1.0,
+            "verdictCounts": {
+              "PASS": 50,
+              "PARSE_REJECT": 0,
+              "CONDITIONAL_ARITH_ERROR": 0,
+              "STALE_STATE_RETENTION": 0,
+              "OVER_RETRACTION": 0
+            },
+            "stalePlusOverCount": 0,
+            "perCondition": {
+              "A": {
+                "n": 25,
+                "pass": 25,
+                "fail": 0,
+                "accuracy": 1.0,
+                "verdicts": {
+                  "PASS": 25,
+                  "PARSE_REJECT": 0,
+                  "CONDITIONAL_ARITH_ERROR": 0,
+                  "STALE_STATE_RETENTION": 0,
+                  "OVER_RETRACTION": 0
+                }
+              },
+              "B": {
+                "n": 7,
+                "pass": 7,
+                "fail": 0,
+                "accuracy": 1.0,
+                "verdicts": {
+                  "PASS": 7,
+                  "PARSE_REJECT": 0,
+                  "CONDITIONAL_ARITH_ERROR": 0,
+                  "STALE_STATE_RETENTION": 0,
+                  "OVER_RETRACTION": 0
+                }
+              },
+              "C": {
+                "n": 6,
+                "pass": 6,
+                "fail": 0,
+                "accuracy": 1.0,
+                "verdicts": {
+                  "PASS": 6,
+                  "PARSE_REJECT": 0,
+                  "CONDITIONAL_ARITH_ERROR": 0,
+                  "STALE_STATE_RETENTION": 0,
+                  "OVER_RETRACTION": 0
+                }
+              },
+              "D": {
+                "n": 6,
+                "pass": 6,
+                "fail": 0,
+                "accuracy": 1.0,
+                "verdicts": {
+                  "PASS": 6,
+                  "PARSE_REJECT": 0,
+                  "CONDITIONAL_ARITH_ERROR": 0,
+                  "STALE_STATE_RETENTION": 0,
+                  "OVER_RETRACTION": 0
+                }
+              },
+              "E": {
+                "n": 6,
+                "pass": 6,
+                "fail": 0,
+                "accuracy": 1.0,
+                "verdicts": {
+                  "PASS": 6,
+                  "PARSE_REJECT": 0,
+                  "CONDITIONAL_ARITH_ERROR": 0,
+                  "STALE_STATE_RETENTION": 0,
+                  "OVER_RETRACTION": 0
+                }
+              }
+            },
+            "is_primary_k2_eligible": false,
+            "ceiling_role": "secondary_neuro_symbolic_solver_offload_upper_bound_only"
+          },
+          "arm3b_symbolic_ceiling": {
+            "n": 50,
+            "passCount": 50,
+            "failCount": 0,
+            "accuracy": 1.0,
+            "failureRate": 0.0,
+            "condATotal": 25,
+            "condAPassCount": 25,
+            "condAFailCount": 0,
+            "condAFailRate": 0.0,
+            "condAK4MaxAllowedFailures": 0,
+            "condAK4Pass": true,
+            "condBETotal": 25,
+            "condBEPassCount": 25,
+            "condBEFailCount": 0,
+            "condBEAccuracy": 1.0,
+            "verdictCounts": {
+              "PASS": 50,
+              "PARSE_REJECT": 0,
+              "CONDITIONAL_ARITH_ERROR": 0,
+              "STALE_STATE_RETENTION": 0,
+              "OVER_RETRACTION": 0
+            },
+            "stalePlusOverCount": 0,
+            "perCondition": {
+              "A": {
+                "n": 25,
+                "pass": 25,
+                "fail": 0,
+                "accuracy": 1.0,
+                "verdicts": {
+                  "PASS": 25,
+                  "PARSE_REJECT": 0,
+                  "CONDITIONAL_ARITH_ERROR": 0,
+                  "STALE_STATE_RETENTION": 0,
+                  "OVER_RETRACTION": 0
+                }
+              },
+              "B": {
+                "n": 7,
+                "pass": 7,
+                "fail": 0,
+                "accuracy": 1.0,
+                "verdicts": {
+                  "PASS": 7,
+                  "PARSE_REJECT": 0,
+                  "CONDITIONAL_ARITH_ERROR": 0,
+                  "STALE_STATE_RETENTION": 0,
+                  "OVER_RETRACTION": 0
+                }
+              },
+              "C": {
+                "n": 6,
+                "pass": 6,
+                "fail": 0,
+                "accuracy": 1.0,
+                "verdicts": {
+                  "PASS": 6,
+                  "PARSE_REJECT": 0,
+                  "CONDITIONAL_ARITH_ERROR": 0,
+                  "STALE_STATE_RETENTION": 0,
+                  "OVER_RETRACTION": 0
+                }
+              },
+              "D": {
+                "n": 6,
+                "pass": 6,
+                "fail": 0,
+                "accuracy": 1.0,
+                "verdicts": {
+                  "PASS": 6,
+                  "PARSE_REJECT": 0,
+                  "CONDITIONAL_ARITH_ERROR": 0,
+                  "STALE_STATE_RETENTION": 0,
+                  "OVER_RETRACTION": 0
+                }
+              },
+              "E": {
+                "n": 6,
+                "pass": 6,
+                "fail": 0,
+                "accuracy": 1.0,
+                "verdicts": {
+                  "PASS": 6,
+                  "PARSE_REJECT": 0,
+                  "CONDITIONAL_ARITH_ERROR": 0,
+                  "STALE_STATE_RETENTION": 0,
+                  "OVER_RETRACTION": 0
+                }
+              }
+            },
+            "is_primary_k2_eligible": false,
+            "ceiling_role": "secondary_neuro_symbolic_solver_offload_upper_bound_only"
+          }
+        },
+        "cleanTurn1": {
+          "arm3a_full_ceiling": {
+            "n": 44,
+            "passCount": 44,
+            "failCount": 0,
+            "accuracy": 1.0,
+            "failureRate": 0.0,
+            "condATotal": 25,
+            "condAPassCount": 25,
+            "condAFailCount": 0,
+            "condAFailRate": 0.0,
+            "condAK4MaxAllowedFailures": 0,
+            "condAK4Pass": true,
+            "condBETotal": 19,
+            "condBEPassCount": 19,
+            "condBEFailCount": 0,
+            "condBEAccuracy": 1.0,
+            "verdictCounts": {
+              "PASS": 44,
+              "PARSE_REJECT": 0,
+              "CONDITIONAL_ARITH_ERROR": 0,
+              "STALE_STATE_RETENTION": 0,
+              "OVER_RETRACTION": 0
+            },
+            "stalePlusOverCount": 0,
+            "perCondition": {
+              "A": {
+                "n": 25,
+                "pass": 25,
+                "fail": 0,
+                "accuracy": 1.0,
+                "verdicts": {
+                  "PASS": 25,
+                  "PARSE_REJECT": 0,
+                  "CONDITIONAL_ARITH_ERROR": 0,
+                  "STALE_STATE_RETENTION": 0,
+                  "OVER_RETRACTION": 0
+                }
+              },
+              "B": {
+                "n": 7,
+                "pass": 7,
+                "fail": 0,
+                "accuracy": 1.0,
+                "verdicts": {
+                  "PASS": 7,
+                  "PARSE_REJECT": 0,
+                  "CONDITIONAL_ARITH_ERROR": 0,
+                  "STALE_STATE_RETENTION": 0,
+                  "OVER_RETRACTION": 0
+                }
+              },
+              "C": {
+                "n": 6,
+                "pass": 6,
+                "fail": 0,
+                "accuracy": 1.0,
+                "verdicts": {
+                  "PASS": 6,
+                  "PARSE_REJECT": 0,
+                  "CONDITIONAL_ARITH_ERROR": 0,
+                  "STALE_STATE_RETENTION": 0,
+                  "OVER_RETRACTION": 0
+                }
+              },
+              "E": {
+                "n": 6,
+                "pass": 6,
+                "fail": 0,
+                "accuracy": 1.0,
+                "verdicts": {
+                  "PASS": 6,
+                  "PARSE_REJECT": 0,
+                  "CONDITIONAL_ARITH_ERROR": 0,
+                  "STALE_STATE_RETENTION": 0,
+                  "OVER_RETRACTION": 0
+                }
+              }
+            },
+            "is_primary_k2_eligible": false,
+            "ceiling_role": "secondary_neuro_symbolic_solver_offload_upper_bound_only"
+          },
+          "arm3b_symbolic_ceiling": {
+            "n": 44,
+            "passCount": 44,
+            "failCount": 0,
+            "accuracy": 1.0,
+            "failureRate": 0.0,
+            "condATotal": 25,
+            "condAPassCount": 25,
+            "condAFailCount": 0,
+            "condAFailRate": 0.0,
+            "condAK4MaxAllowedFailures": 0,
+            "condAK4Pass": true,
+            "condBETotal": 19,
+            "condBEPassCount": 19,
+            "condBEFailCount": 0,
+            "condBEAccuracy": 1.0,
+            "verdictCounts": {
+              "PASS": 44,
+              "PARSE_REJECT": 0,
+              "CONDITIONAL_ARITH_ERROR": 0,
+              "STALE_STATE_RETENTION": 0,
+              "OVER_RETRACTION": 0
+            },
+            "stalePlusOverCount": 0,
+            "perCondition": {
+              "A": {
+                "n": 25,
+                "pass": 25,
+                "fail": 0,
+                "accuracy": 1.0,
+                "verdicts": {
+                  "PASS": 25,
+                  "PARSE_REJECT": 0,
+                  "CONDITIONAL_ARITH_ERROR": 0,
+                  "STALE_STATE_RETENTION": 0,
+                  "OVER_RETRACTION": 0
+                }
+              },
+              "B": {
+                "n": 7,
+                "pass": 7,
+                "fail": 0,
+                "accuracy": 1.0,
+                "verdicts": {
+                  "PASS": 7,
+                  "PARSE_REJECT": 0,
+                  "CONDITIONAL_ARITH_ERROR": 0,
+                  "STALE_STATE_RETENTION": 0,
+                  "OVER_RETRACTION": 0
+                }
+              },
+              "C": {
+                "n": 6,
+                "pass": 6,
+                "fail": 0,
+                "accuracy": 1.0,
+                "verdicts": {
+                  "PASS": 6,
+                  "PARSE_REJECT": 0,
+                  "CONDITIONAL_ARITH_ERROR": 0,
+                  "STALE_STATE_RETENTION": 0,
+                  "OVER_RETRACTION": 0
+                }
+              },
+              "E": {
+                "n": 6,
+                "pass": 6,
+                "fail": 0,
+                "accuracy": 1.0,
+                "verdicts": {
+                  "PASS": 6,
+                  "PARSE_REJECT": 0,
+                  "CONDITIONAL_ARITH_ERROR": 0,
+                  "STALE_STATE_RETENTION": 0,
+                  "OVER_RETRACTION": 0
+                }
+              }
+            },
+            "is_primary_k2_eligible": false,
+            "ceiling_role": "secondary_neuro_symbolic_solver_offload_upper_bound_only"
+          }
+        }
+      }
+    }
+  },
+  "nf4_l4_throughput_probe": {
+    "hardware": "NVIDIA L4-24GB",
+    "dtype": "nf4",
+    "repoId": "Qwen/Qwen3.8-27B",
+    "enableThinking": false,
+    "episodesPath": "/tmp/qwen38_27b_nf4_off_baseline_smoke.jsonl",
+    "episodesSha256": "5c2104fc9336f163df155987d7dc69fc6faaea33f2abef84b278bd0b6fc16bb3",
+    "summaryPath": "/tmp/qwen38_27b_nf4_off_baseline_smoke_summary.json",
+    "summarySha256": "c16832a5c2991c7594ae7e2fb4f85a7e4226b80de08746da818edc9512369472",
+    "loadSec": 322.67,
+    "avgSecPerItem": 105.291,
+    "peakVramAllocGb": 17.077,
+    "peakVramReservedGb": 17.258,
+    "nEpisodes": 1,
+    "passCount": 1,
+    "verdictCounts": {
+      "PASS": 1
+    },
+    "smokeGatePass": false,
+    "throughputAbortFinding": "4-bit NF4 dense 27B inference on L4-24GB requires 105.291 s/item (> 15.0 s/item operational abort threshold) and 322.67 s model load at 17.258 GB reserved VRAM, confirming that 27B dense control sweeps require >=80GB A100/H100 hardware rather than L4 fallback."
+  },
+  "manifest_body_sha256": "4b300bb7859c34e4a614cd150ec2dd78e85b4027b2c42a6d617391bd95746d6c"
+}

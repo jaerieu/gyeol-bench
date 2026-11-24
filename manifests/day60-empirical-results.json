@@ -1,0 +1,1518 @@
+{
+  "schema_version": "1.0.0",
+  "milestone": "Day-60-Empirical-Dual-Regime-Synthesis",
+  "benchmark_package": "gyeol-bench",
+  "benchmark_version": "0.1.0",
+  "primary_task": "gyeol_bench/retraction_dag_multiturn",
+  "ablation_zero_task": "gyeol_bench/retraction_dag",
+  "governance_grade": "[안전]",
+  "pre_experiment_seals_preserved": {
+    "day46_baseline_freeze_path": "manifests/day46-baseline-freeze.json",
+    "day46_manifest_body_sha256": "a542492ed604bd2b3b2b0e02e0fde3c6c8ee856082f3e27d952f55a74ada68d4",
+    "day46_rfc6962_merkle_root_hex": "d54cc303f3ab11521356e563610da53b799d6b9d9619017d51de43a08ee6a634",
+    "v3_prepilot_lock_path": "manifests/v3-multiturn-prepilot-lock.json",
+    "v3_prepilot_lock_sha256": "eac8d83e62ceb784f9096d5aab8540ee70a07f57d10950cb77fea57202502e53",
+    "v3_main_eval_n800_dataset_sha256": "fbc72894c59ea40045070a1fed4b1b8f3f830ab694e60ea888c1ff188d11fdef"
+  },
+  "phase3_raw_bundle_provenance": {
+    "local_staging_path": "/tmp/gyeol-colab-checkpoints/phase3-open-k2-n800/phase3-open-k2-n800-bundle.json",
+    "r2_bucket_prefix": "r2:gyeol-bench-checkpoints/stage1/phase3-open-k2-n800",
+    "r2_synced_file_count": 75,
+    "bundle_sha256": "785beb4c3a67fc85fadd985261a484253e2e686c483fb5a130c8113703f0ba8e",
+    "evaluation_seed": 20261122,
+    "episodes_per_model": 800,
+    "total_episodes_evaluated": 2400,
+    "total_live_turns_executed": 7200
+  },
+  "cumulative_resource_ledger": {
+    "aistudio_paid_batch_pilot_usd": 1.130102,
+    "aistudio_phase3_incremental_usd": 0.0,
+    "aistudio_five_pct_cap_usd": 5.0,
+    "colab_initial_cu": 3251.14,
+    "colab_pilots_v1_v2_v3_cu": 5.84,
+    "colab_phase3_n800_cu": 32.39,
+    "colab_cumulative_used_cu": 38.23,
+    "colab_remaining_cu": 3212.91,
+    "colab_branch2_cap_cu": 155.0,
+    "colab_five_pct_cap_cu": 162.56,
+    "active_l4_vms_post_teardown": 0
+  },
+  "k6_claim_bounds_and_gate_verdicts": {
+    "positive_k2_prompt_claim_permitted": false,
+    "K3_open_weight_non_saturation_verdict": "PASS_3_OF_3 (35.88%, 48.75%, 27.75% >= 10.0%)",
+    "K3_frontier_tier_verdict": "OPTION_C_HALTED_SATURATED (0/50 on gemini-4-carbon and gemini-4-hydrogen via contents[0] KV re-reference)",
+    "K2_prompt_only_lineage_verdict": "FALSIFIED_0_OF_3 ([경고]: Arm 2 cut STALE_STATE_RETENTION 194 -> 16 [-91.8%] while surging OVER_RETRACTION 113 -> 517 ITT / 19 -> 412 Clean-T1, proving deterministic runtime enforcement is required over prompt checklists)",
+    "K4_normal_control_specificity_verdict": "STRATIFIED (Phi-4 [안전] Arm1 1/400 CP95 1.39% & Arm2 0/400 CP95 0.92%; Qwen2.5-14B Arm1 23/400 [주의] & Arm2 308/400 [경고]; Mistral-Small-24B Arm1 9/400 [주의] & Arm2 20/400 [주의])",
+    "analysis_hierarchy": {
+      "primary_population": "Stratified_ITT_N800_Per_Model",
+      "secondary_population": "Pooled_ITT_N2400",
+      "sensitivity_population": "Stratified_Clean_T1_Per_Model"
+    }
+  },
+  "branch1_frontier_saturation_control": {
+    "report_path": "agent_artefacts/retraction_dag_0.1.0/validity/SATURATION_REPORT.md",
+    "report_sha256": "b4411f037083eb98745078bd57f742365821b674a5c227fb194d2cfabfd031ab",
+    "v3_pilot_seed": 20261151,
+    "v3_pilot_n": 50,
+    "models": {
+      "models/gemini-4-carbon": {
+        "turn1_clean": "48/50",
+        "turn2_fail": "0/50 (0.00%)",
+        "cp95_two_sided_upper": 0.0711
+      },
+      "models/gemini-4-hydrogen": {
+        "turn1_clean": "50/50",
+        "turn2_fail": "0/50 (0.00%)",
+        "cp95_two_sided_upper": 0.0711
+      }
+    }
+  },
+  "branch2_open_weight_n800_models": [
+    {
+      "modelPrefix": "p3-phi4",
+      "family": "Phi-4",
+      "repoId": "microsoft/phi-4",
+      "revisionSha": "2db69c1c3e91a05d2c64a3185acfbaf36f744e25",
+      "spdxLicense": "MIT",
+      "quantMode": "nf4",
+      "safetensorsParamsB": 14.66,
+      "numParametersB": 14.66,
+      "shardCount": 1,
+      "sampleSize": 800,
+      "turn1Shared": {
+        "cleanCount": 768,
+        "cleanRate": 0.96,
+        "condACleanCount": 400,
+        "condBECleanCount": 368,
+        "verdictCounts": {
+          "PASS": 768,
+          "PARSE_REJECT": 2,
+          "CONDITIONAL_ARITH_ERROR": 15,
+          "STALE_STATE_RETENTION": 0,
+          "OVER_RETRACTION": 15
+        },
+        "truncatedCount": 0
+      },
+      "ittN800": {
+        "n": 800,
+        "arm1Baseline": {
+          "n": 800,
+          "passCount": 513,
+          "failCount": 287,
+          "accuracy": 0.64125,
+          "failureRate": 0.35875,
+          "accuracyCp95": [
+            0.606916,
+            0.674538
+          ],
+          "condATotal": 400,
+          "condAFailCount": 1,
+          "condAFailRate": 0.0025,
+          "condAFailCp95TwoSidedUpper": 0.01385,
+          "condAFailCp95OneSidedUpper": 0.011804,
+          "condAK4PassLe5Of400": true,
+          "condBETotal": 400,
+          "condBEPassCount": 114,
+          "condBEFailCount": 286,
+          "condBEAccuracy": 0.285,
+          "condBEFailureRate": 0.715,
+          "condBEAccuracyCp95": [
+            0.241246,
+            0.331969
+          ],
+          "verdictCounts": {
+            "PASS": 513,
+            "PARSE_REJECT": 0,
+            "CONDITIONAL_ARITH_ERROR": 165,
+            "STALE_STATE_RETENTION": 106,
+            "OVER_RETRACTION": 16
+          },
+          "stalePlusOverCount": 122,
+          "truncatedCount": 0,
+          "perCondition": {
+            "A": {
+              "n": 400,
+              "pass": 399,
+              "fail": 1,
+              "verdicts": {
+                "PASS": 399,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 1
+              }
+            },
+            "B": {
+              "n": 100,
+              "pass": 3,
+              "fail": 97,
+              "verdicts": {
+                "PASS": 3,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 61,
+                "STALE_STATE_RETENTION": 36,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "C": {
+              "n": 100,
+              "pass": 88,
+              "fail": 12,
+              "verdicts": {
+                "PASS": 88,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 3,
+                "STALE_STATE_RETENTION": 9,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "D": {
+              "n": 100,
+              "pass": 22,
+              "fail": 78,
+              "verdicts": {
+                "PASS": 22,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 50,
+                "STALE_STATE_RETENTION": 28,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "E": {
+              "n": 100,
+              "pass": 1,
+              "fail": 99,
+              "verdicts": {
+                "PASS": 1,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 51,
+                "STALE_STATE_RETENTION": 33,
+                "OVER_RETRACTION": 15
+              }
+            }
+          }
+        },
+        "arm2LineageK2": {
+          "n": 800,
+          "passCount": 512,
+          "failCount": 288,
+          "accuracy": 0.64,
+          "failureRate": 0.36,
+          "accuracyCp95": [
+            0.605645,
+            0.673318
+          ],
+          "condATotal": 400,
+          "condAFailCount": 0,
+          "condAFailRate": 0.0,
+          "condAFailCp95TwoSidedUpper": 0.00918,
+          "condAFailCp95OneSidedUpper": 0.007461,
+          "condAK4PassLe5Of400": true,
+          "condBETotal": 400,
+          "condBEPassCount": 112,
+          "condBEFailCount": 288,
+          "condBEAccuracy": 0.28,
+          "condBEFailureRate": 0.72,
+          "condBEAccuracyCp95": [
+            0.236519,
+            0.326771
+          ],
+          "verdictCounts": {
+            "PASS": 512,
+            "PARSE_REJECT": 2,
+            "CONDITIONAL_ARITH_ERROR": 141,
+            "STALE_STATE_RETENTION": 7,
+            "OVER_RETRACTION": 138
+          },
+          "stalePlusOverCount": 145,
+          "truncatedCount": 0,
+          "perCondition": {
+            "A": {
+              "n": 400,
+              "pass": 400,
+              "fail": 0,
+              "verdicts": {
+                "PASS": 400,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "B": {
+              "n": 100,
+              "pass": 1,
+              "fail": 99,
+              "verdicts": {
+                "PASS": 1,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 49,
+                "STALE_STATE_RETENTION": 4,
+                "OVER_RETRACTION": 46
+              }
+            },
+            "C": {
+              "n": 100,
+              "pass": 86,
+              "fail": 14,
+              "verdicts": {
+                "PASS": 86,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 11,
+                "STALE_STATE_RETENTION": 3,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "D": {
+              "n": 100,
+              "pass": 24,
+              "fail": 76,
+              "verdicts": {
+                "PASS": 24,
+                "PARSE_REJECT": 2,
+                "CONDITIONAL_ARITH_ERROR": 38,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 36
+              }
+            },
+            "E": {
+              "n": 100,
+              "pass": 1,
+              "fail": 99,
+              "verdicts": {
+                "PASS": 1,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 43,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 56
+              }
+            }
+          }
+        },
+        "stalePlusOverDeltaArm2MinusArm1": 23,
+        "mcnemar": {
+          "aBothPass": 491,
+          "bArm1FailArm2Pass": 21,
+          "cArm1PassArm2Fail": 22,
+          "dBothFail": 266,
+          "bMinusC": -1,
+          "bPlusC": 43,
+          "netGainOverN": -0.00125,
+          "netGainOver800": -0.00125,
+          "twoSidedExactP": 1.0,
+          "k2GatePassItt800": false,
+          "beOnlyB": 20,
+          "beOnlyC": 22,
+          "beOnlyTwoSidedExactP": 0.8776143287523155
+        }
+      },
+      "cleanTurn1Sensitivity": {
+        "n": 768,
+        "arm1Baseline": {
+          "n": 768,
+          "passCount": 504,
+          "failCount": 264,
+          "accuracy": 0.65625,
+          "failureRate": 0.34375,
+          "accuracyCp95": [
+            0.621457,
+            0.689837
+          ],
+          "condATotal": 400,
+          "condAFailCount": 1,
+          "condAFailRate": 0.0025,
+          "condAFailCp95TwoSidedUpper": 0.01385,
+          "condAFailCp95OneSidedUpper": 0.011804,
+          "condAK4PassLe5Of400": true,
+          "condBETotal": 368,
+          "condBEPassCount": 105,
+          "condBEFailCount": 263,
+          "condBEAccuracy": 0.285326,
+          "condBEFailureRate": 0.714674,
+          "condBEAccuracyCp95": [
+            0.239721,
+            0.334424
+          ],
+          "verdictCounts": {
+            "PASS": 504,
+            "PARSE_REJECT": 0,
+            "CONDITIONAL_ARITH_ERROR": 157,
+            "STALE_STATE_RETENTION": 106,
+            "OVER_RETRACTION": 1
+          },
+          "stalePlusOverCount": 107,
+          "truncatedCount": 0,
+          "perCondition": {
+            "A": {
+              "n": 400,
+              "pass": 399,
+              "fail": 1,
+              "verdicts": {
+                "PASS": 399,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 1
+              }
+            },
+            "B": {
+              "n": 100,
+              "pass": 3,
+              "fail": 97,
+              "verdicts": {
+                "PASS": 3,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 61,
+                "STALE_STATE_RETENTION": 36,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "C": {
+              "n": 100,
+              "pass": 88,
+              "fail": 12,
+              "verdicts": {
+                "PASS": 88,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 3,
+                "STALE_STATE_RETENTION": 9,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "D": {
+              "n": 83,
+              "pass": 13,
+              "fail": 70,
+              "verdicts": {
+                "PASS": 13,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 42,
+                "STALE_STATE_RETENTION": 28,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "E": {
+              "n": 85,
+              "pass": 1,
+              "fail": 84,
+              "verdicts": {
+                "PASS": 1,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 51,
+                "STALE_STATE_RETENTION": 33,
+                "OVER_RETRACTION": 0
+              }
+            }
+          }
+        },
+        "arm2LineageK2": {
+          "n": 768,
+          "passCount": 507,
+          "failCount": 261,
+          "accuracy": 0.660156,
+          "failureRate": 0.339844,
+          "accuracyCp95": [
+            0.62544,
+            0.693636
+          ],
+          "condATotal": 400,
+          "condAFailCount": 0,
+          "condAFailRate": 0.0,
+          "condAFailCp95TwoSidedUpper": 0.00918,
+          "condAFailCp95OneSidedUpper": 0.007461,
+          "condAK4PassLe5Of400": true,
+          "condBETotal": 368,
+          "condBEPassCount": 107,
+          "condBEFailCount": 261,
+          "condBEAccuracy": 0.290761,
+          "condBEFailureRate": 0.709239,
+          "condBEAccuracyCp95": [
+            0.244853,
+            0.340073
+          ],
+          "verdictCounts": {
+            "PASS": 507,
+            "PARSE_REJECT": 0,
+            "CONDITIONAL_ARITH_ERROR": 134,
+            "STALE_STATE_RETENTION": 7,
+            "OVER_RETRACTION": 120
+          },
+          "stalePlusOverCount": 127,
+          "truncatedCount": 0,
+          "perCondition": {
+            "A": {
+              "n": 400,
+              "pass": 400,
+              "fail": 0,
+              "verdicts": {
+                "PASS": 400,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "B": {
+              "n": 100,
+              "pass": 1,
+              "fail": 99,
+              "verdicts": {
+                "PASS": 1,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 49,
+                "STALE_STATE_RETENTION": 4,
+                "OVER_RETRACTION": 46
+              }
+            },
+            "C": {
+              "n": 100,
+              "pass": 86,
+              "fail": 14,
+              "verdicts": {
+                "PASS": 86,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 11,
+                "STALE_STATE_RETENTION": 3,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "D": {
+              "n": 83,
+              "pass": 19,
+              "fail": 64,
+              "verdicts": {
+                "PASS": 19,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 31,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 33
+              }
+            },
+            "E": {
+              "n": 85,
+              "pass": 1,
+              "fail": 84,
+              "verdicts": {
+                "PASS": 1,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 43,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 41
+              }
+            }
+          }
+        },
+        "stalePlusOverDeltaArm2MinusArm1": 20,
+        "mcnemar": {
+          "aBothPass": 486,
+          "bArm1FailArm2Pass": 21,
+          "cArm1PassArm2Fail": 18,
+          "dBothFail": 243,
+          "bMinusC": 3,
+          "bPlusC": 39,
+          "netGainOverN": 0.003906,
+          "netGainOver800": 0.00375,
+          "twoSidedExactP": 0.7492586247608415,
+          "k2GatePassItt800": false,
+          "beOnlyB": 20,
+          "beOnlyC": 18,
+          "beOnlyTwoSidedExactP": 0.8714146793645341
+        }
+      },
+      "timing": {
+        "sumLoadSeconds": 140.69,
+        "sumTurn1EvalSeconds": 3050.64,
+        "sumArm1EvalSeconds": 5110.21,
+        "sumArm2EvalSeconds": 5338.96,
+        "maxShardWallSeconds": 13642.51,
+        "maxPeakTorchVramGiB": 10.39
+      }
+    },
+    {
+      "modelPrefix": "p3-qwen14b",
+      "family": "Qwen2.5-14B",
+      "repoId": "Qwen/Qwen2.5-14B-Instruct",
+      "revisionSha": "cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8",
+      "spdxLicense": "Apache-2.0",
+      "quantMode": "nf4",
+      "safetensorsParamsB": 14.77,
+      "numParametersB": 14.77,
+      "shardCount": 1,
+      "sampleSize": 800,
+      "turn1Shared": {
+        "cleanCount": 686,
+        "cleanRate": 0.8575,
+        "condACleanCount": 394,
+        "condBECleanCount": 292,
+        "verdictCounts": {
+          "PASS": 686,
+          "PARSE_REJECT": 0,
+          "CONDITIONAL_ARITH_ERROR": 30,
+          "STALE_STATE_RETENTION": 0,
+          "OVER_RETRACTION": 84
+        },
+        "truncatedCount": 0
+      },
+      "ittN800": {
+        "n": 800,
+        "arm1Baseline": {
+          "n": 800,
+          "passCount": 410,
+          "failCount": 390,
+          "accuracy": 0.5125,
+          "failureRate": 0.4875,
+          "accuracyCp95": [
+            0.477247,
+            0.547661
+          ],
+          "condATotal": 400,
+          "condAFailCount": 23,
+          "condAFailRate": 0.0575,
+          "condAFailCp95TwoSidedUpper": 0.085032,
+          "condAFailCp95OneSidedUpper": 0.080482,
+          "condAK4PassLe5Of400": false,
+          "condBETotal": 400,
+          "condBEPassCount": 33,
+          "condBEFailCount": 367,
+          "condBEAccuracy": 0.0825,
+          "condBEFailureRate": 0.9175,
+          "condBEAccuracyCp95": [
+            0.057468,
+            0.113911
+          ],
+          "verdictCounts": {
+            "PASS": 410,
+            "PARSE_REJECT": 5,
+            "CONDITIONAL_ARITH_ERROR": 204,
+            "STALE_STATE_RETENTION": 86,
+            "OVER_RETRACTION": 95
+          },
+          "stalePlusOverCount": 181,
+          "truncatedCount": 3,
+          "perCondition": {
+            "A": {
+              "n": 400,
+              "pass": 377,
+              "fail": 23,
+              "verdicts": {
+                "PASS": 377,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 7,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 16
+              }
+            },
+            "B": {
+              "n": 100,
+              "pass": 0,
+              "fail": 100,
+              "verdicts": {
+                "PASS": 0,
+                "PARSE_REJECT": 2,
+                "CONDITIONAL_ARITH_ERROR": 56,
+                "STALE_STATE_RETENTION": 42,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "C": {
+              "n": 100,
+              "pass": 24,
+              "fail": 76,
+              "verdicts": {
+                "PASS": 24,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 73,
+                "STALE_STATE_RETENTION": 3,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "D": {
+              "n": 100,
+              "pass": 9,
+              "fail": 91,
+              "verdicts": {
+                "PASS": 9,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 52,
+                "STALE_STATE_RETENTION": 39,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "E": {
+              "n": 100,
+              "pass": 0,
+              "fail": 100,
+              "verdicts": {
+                "PASS": 0,
+                "PARSE_REJECT": 3,
+                "CONDITIONAL_ARITH_ERROR": 16,
+                "STALE_STATE_RETENTION": 2,
+                "OVER_RETRACTION": 79
+              }
+            }
+          }
+        },
+        "arm2LineageK2": {
+          "n": 800,
+          "passCount": 190,
+          "failCount": 610,
+          "accuracy": 0.2375,
+          "failureRate": 0.7625,
+          "accuracyCp95": [
+            0.208398,
+            0.26855
+          ],
+          "condATotal": 400,
+          "condAFailCount": 308,
+          "condAFailRate": 0.77,
+          "condAFailCp95TwoSidedUpper": 0.810361,
+          "condAFailCp95OneSidedUpper": 0.804289,
+          "condAK4PassLe5Of400": false,
+          "condBETotal": 400,
+          "condBEPassCount": 98,
+          "condBEFailCount": 302,
+          "condBEAccuracy": 0.245,
+          "condBEFailureRate": 0.755,
+          "condBEAccuracyCp95": [
+            0.203624,
+            0.290195
+          ],
+          "verdictCounts": {
+            "PASS": 190,
+            "PARSE_REJECT": 28,
+            "CONDITIONAL_ARITH_ERROR": 212,
+            "STALE_STATE_RETENTION": 4,
+            "OVER_RETRACTION": 366
+          },
+          "stalePlusOverCount": 370,
+          "truncatedCount": 0,
+          "perCondition": {
+            "A": {
+              "n": 400,
+              "pass": 92,
+              "fail": 308,
+              "verdicts": {
+                "PASS": 92,
+                "PARSE_REJECT": 22,
+                "CONDITIONAL_ARITH_ERROR": 3,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 283
+              }
+            },
+            "B": {
+              "n": 100,
+              "pass": 1,
+              "fail": 99,
+              "verdicts": {
+                "PASS": 1,
+                "PARSE_REJECT": 1,
+                "CONDITIONAL_ARITH_ERROR": 97,
+                "STALE_STATE_RETENTION": 1,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "C": {
+              "n": 100,
+              "pass": 70,
+              "fail": 30,
+              "verdicts": {
+                "PASS": 70,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 30,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "D": {
+              "n": 100,
+              "pass": 27,
+              "fail": 73,
+              "verdicts": {
+                "PASS": 27,
+                "PARSE_REJECT": 4,
+                "CONDITIONAL_ARITH_ERROR": 66,
+                "STALE_STATE_RETENTION": 3,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "E": {
+              "n": 100,
+              "pass": 0,
+              "fail": 100,
+              "verdicts": {
+                "PASS": 0,
+                "PARSE_REJECT": 1,
+                "CONDITIONAL_ARITH_ERROR": 16,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 83
+              }
+            }
+          }
+        },
+        "stalePlusOverDeltaArm2MinusArm1": 189,
+        "mcnemar": {
+          "aBothPass": 112,
+          "bArm1FailArm2Pass": 78,
+          "cArm1PassArm2Fail": 298,
+          "dBothFail": 312,
+          "bMinusC": -220,
+          "bPlusC": 376,
+          "netGainOverN": -0.275,
+          "netGainOver800": -0.275,
+          "twoSidedExactP": 2.0885173689167147e-31,
+          "k2GatePassItt800": false,
+          "beOnlyB": 76,
+          "beOnlyC": 11,
+          "beOnlyTwoSidedExactP": 4.2113505095150765e-13
+        }
+      },
+      "cleanTurn1Sensitivity": {
+        "n": 686,
+        "arm1Baseline": {
+          "n": 686,
+          "passCount": 408,
+          "failCount": 278,
+          "accuracy": 0.594752,
+          "failureRate": 0.405248,
+          "accuracyCp95": [
+            0.556943,
+            0.631743
+          ],
+          "condATotal": 394,
+          "condAFailCount": 17,
+          "condAFailRate": 0.043147,
+          "condAFailCp95TwoSidedUpper": 0.068186,
+          "condAFailCp95OneSidedUpper": 0.064019,
+          "condAK4PassLe5Of400": null,
+          "condBETotal": 292,
+          "condBEPassCount": 31,
+          "condBEFailCount": 261,
+          "condBEAccuracy": 0.106164,
+          "condBEFailureRate": 0.893836,
+          "condBEAccuracyCp95": [
+            0.073282,
+            0.147299
+          ],
+          "verdictCounts": {
+            "PASS": 408,
+            "PARSE_REJECT": 2,
+            "CONDITIONAL_ARITH_ERROR": 177,
+            "STALE_STATE_RETENTION": 83,
+            "OVER_RETRACTION": 16
+          },
+          "stalePlusOverCount": 99,
+          "truncatedCount": 0,
+          "perCondition": {
+            "A": {
+              "n": 394,
+              "pass": 377,
+              "fail": 17,
+              "verdicts": {
+                "PASS": 377,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 1,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 16
+              }
+            },
+            "B": {
+              "n": 99,
+              "pass": 0,
+              "fail": 99,
+              "verdicts": {
+                "PASS": 0,
+                "PARSE_REJECT": 2,
+                "CONDITIONAL_ARITH_ERROR": 55,
+                "STALE_STATE_RETENTION": 42,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "C": {
+              "n": 100,
+              "pass": 24,
+              "fail": 76,
+              "verdicts": {
+                "PASS": 24,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 73,
+                "STALE_STATE_RETENTION": 3,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "D": {
+              "n": 86,
+              "pass": 7,
+              "fail": 79,
+              "verdicts": {
+                "PASS": 7,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 41,
+                "STALE_STATE_RETENTION": 38,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "E": {
+              "n": 7,
+              "pass": 0,
+              "fail": 7,
+              "verdicts": {
+                "PASS": 0,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 7,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            }
+          }
+        },
+        "arm2LineageK2": {
+          "n": 686,
+          "passCount": 188,
+          "failCount": 498,
+          "accuracy": 0.274052,
+          "failureRate": 0.725948,
+          "accuracyCp95": [
+            0.240978,
+            0.309084
+          ],
+          "condATotal": 394,
+          "condAFailCount": 302,
+          "condAFailRate": 0.766497,
+          "condAFailCp95TwoSidedUpper": 0.807402,
+          "condAFailCp95OneSidedUpper": 0.801246,
+          "condAK4PassLe5Of400": null,
+          "condBETotal": 292,
+          "condBEPassCount": 96,
+          "condBEFailCount": 196,
+          "condBEAccuracy": 0.328767,
+          "condBEFailureRate": 0.671233,
+          "condBEAccuracyCp95": [
+            0.275156,
+            0.385896
+          ],
+          "verdictCounts": {
+            "PASS": 188,
+            "PARSE_REJECT": 27,
+            "CONDITIONAL_ARITH_ERROR": 188,
+            "STALE_STATE_RETENTION": 4,
+            "OVER_RETRACTION": 279
+          },
+          "stalePlusOverCount": 283,
+          "truncatedCount": 0,
+          "perCondition": {
+            "A": {
+              "n": 394,
+              "pass": 92,
+              "fail": 302,
+              "verdicts": {
+                "PASS": 92,
+                "PARSE_REJECT": 22,
+                "CONDITIONAL_ARITH_ERROR": 1,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 279
+              }
+            },
+            "B": {
+              "n": 99,
+              "pass": 1,
+              "fail": 98,
+              "verdicts": {
+                "PASS": 1,
+                "PARSE_REJECT": 1,
+                "CONDITIONAL_ARITH_ERROR": 96,
+                "STALE_STATE_RETENTION": 1,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "C": {
+              "n": 100,
+              "pass": 70,
+              "fail": 30,
+              "verdicts": {
+                "PASS": 70,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 30,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "D": {
+              "n": 86,
+              "pass": 25,
+              "fail": 61,
+              "verdicts": {
+                "PASS": 25,
+                "PARSE_REJECT": 4,
+                "CONDITIONAL_ARITH_ERROR": 54,
+                "STALE_STATE_RETENTION": 3,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "E": {
+              "n": 7,
+              "pass": 0,
+              "fail": 7,
+              "verdicts": {
+                "PASS": 0,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 7,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            }
+          }
+        },
+        "stalePlusOverDeltaArm2MinusArm1": 184,
+        "mcnemar": {
+          "aBothPass": 110,
+          "bArm1FailArm2Pass": 78,
+          "cArm1PassArm2Fail": 298,
+          "dBothFail": 200,
+          "bMinusC": -220,
+          "bPlusC": 376,
+          "netGainOverN": -0.3207,
+          "netGainOver800": -0.275,
+          "twoSidedExactP": 2.0885173689167147e-31,
+          "k2GatePassItt800": false,
+          "beOnlyB": 76,
+          "beOnlyC": 11,
+          "beOnlyTwoSidedExactP": 4.2113505095150765e-13
+        }
+      },
+      "timing": {
+        "sumLoadSeconds": 137.43,
+        "sumTurn1EvalSeconds": 1021.69,
+        "sumArm1EvalSeconds": 1861.19,
+        "sumArm2EvalSeconds": 2368.56,
+        "maxShardWallSeconds": 5389.5,
+        "maxPeakTorchVramGiB": 10.93
+      }
+    },
+    {
+      "modelPrefix": "p3-mistral24b",
+      "family": "Mistral-Small-24B",
+      "repoId": "mistralai/Mistral-Small-24B-Instruct-2501",
+      "revisionSha": "9527884be6e5616bdd54de542f9ae13384489724",
+      "spdxLicense": "Apache-2.0",
+      "quantMode": "nf4",
+      "safetensorsParamsB": 23.572,
+      "numParametersB": 23.572,
+      "shardCount": 2,
+      "sampleSize": 800,
+      "turn1Shared": {
+        "cleanCount": 595,
+        "cleanRate": 0.74375,
+        "condACleanCount": 396,
+        "condBECleanCount": 199,
+        "verdictCounts": {
+          "PASS": 595,
+          "PARSE_REJECT": 102,
+          "CONDITIONAL_ARITH_ERROR": 103,
+          "STALE_STATE_RETENTION": 0,
+          "OVER_RETRACTION": 0
+        },
+        "truncatedCount": 8
+      },
+      "ittN800": {
+        "n": 800,
+        "arm1Baseline": {
+          "n": 800,
+          "passCount": 578,
+          "failCount": 222,
+          "accuracy": 0.7225,
+          "failureRate": 0.2775,
+          "accuracyCp95": [
+            0.690065,
+            0.753285
+          ],
+          "condATotal": 400,
+          "condAFailCount": 9,
+          "condAFailRate": 0.0225,
+          "condAFailCp95TwoSidedUpper": 0.042281,
+          "condAFailCp95OneSidedUpper": 0.038934,
+          "condAK4PassLe5Of400": false,
+          "condBETotal": 400,
+          "condBEPassCount": 187,
+          "condBEFailCount": 213,
+          "condBEAccuracy": 0.4675,
+          "condBEFailureRate": 0.5325,
+          "condBEAccuracyCp95": [
+            0.417753,
+            0.517731
+          ],
+          "verdictCounts": {
+            "PASS": 578,
+            "PARSE_REJECT": 101,
+            "CONDITIONAL_ARITH_ERROR": 117,
+            "STALE_STATE_RETENTION": 2,
+            "OVER_RETRACTION": 2
+          },
+          "stalePlusOverCount": 4,
+          "truncatedCount": 2,
+          "perCondition": {
+            "A": {
+              "n": 400,
+              "pass": 391,
+              "fail": 9,
+              "verdicts": {
+                "PASS": 391,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 9,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "B": {
+              "n": 100,
+              "pass": 50,
+              "fail": 50,
+              "verdicts": {
+                "PASS": 50,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 48,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 2
+              }
+            },
+            "C": {
+              "n": 100,
+              "pass": 98,
+              "fail": 2,
+              "verdicts": {
+                "PASS": 98,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 2,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "D": {
+              "n": 100,
+              "pass": 39,
+              "fail": 61,
+              "verdicts": {
+                "PASS": 39,
+                "PARSE_REJECT": 1,
+                "CONDITIONAL_ARITH_ERROR": 60,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "E": {
+              "n": 100,
+              "pass": 0,
+              "fail": 100,
+              "verdicts": {
+                "PASS": 0,
+                "PARSE_REJECT": 100,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            }
+          }
+        },
+        "arm2LineageK2": {
+          "n": 800,
+          "passCount": 533,
+          "failCount": 267,
+          "accuracy": 0.66625,
+          "failureRate": 0.33375,
+          "accuracyCp95": [
+            0.632382,
+            0.698887
+          ],
+          "condATotal": 400,
+          "condAFailCount": 20,
+          "condAFailRate": 0.05,
+          "condAFailCp95TwoSidedUpper": 0.076167,
+          "condAFailCp95OneSidedUpper": 0.071829,
+          "condAK4PassLe5Of400": false,
+          "condBETotal": 400,
+          "condBEPassCount": 153,
+          "condBEFailCount": 247,
+          "condBEAccuracy": 0.3825,
+          "condBEFailureRate": 0.6175,
+          "condBEAccuracyCp95": [
+            0.334648,
+            0.432105
+          ],
+          "verdictCounts": {
+            "PASS": 533,
+            "PARSE_REJECT": 100,
+            "CONDITIONAL_ARITH_ERROR": 149,
+            "STALE_STATE_RETENTION": 5,
+            "OVER_RETRACTION": 13
+          },
+          "stalePlusOverCount": 18,
+          "truncatedCount": 4,
+          "perCondition": {
+            "A": {
+              "n": 400,
+              "pass": 380,
+              "fail": 20,
+              "verdicts": {
+                "PASS": 380,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 7,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 13
+              }
+            },
+            "B": {
+              "n": 100,
+              "pass": 0,
+              "fail": 100,
+              "verdicts": {
+                "PASS": 0,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 95,
+                "STALE_STATE_RETENTION": 5,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "C": {
+              "n": 100,
+              "pass": 99,
+              "fail": 1,
+              "verdicts": {
+                "PASS": 99,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 1,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "D": {
+              "n": 100,
+              "pass": 54,
+              "fail": 46,
+              "verdicts": {
+                "PASS": 54,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 46,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "E": {
+              "n": 100,
+              "pass": 0,
+              "fail": 100,
+              "verdicts": {
+                "PASS": 0,
+                "PARSE_REJECT": 100,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            }
+          }
+        },
+        "stalePlusOverDeltaArm2MinusArm1": 14,
+        "mcnemar": {
+          "aBothPass": 500,
+          "bArm1FailArm2Pass": 33,
+          "cArm1PassArm2Fail": 78,
+          "dBothFail": 189,
+          "bMinusC": -45,
+          "bPlusC": 111,
+          "netGainOverN": -0.05625,
+          "netGainOver800": -0.05625,
+          "twoSidedExactP": 2.32626705010725e-05,
+          "k2GatePassItt800": false,
+          "beOnlyB": 28,
+          "beOnlyC": 62,
+          "beOnlyTwoSidedExactP": 0.00043792219663413404
+        }
+      },
+      "cleanTurn1Sensitivity": {
+        "n": 595,
+        "arm1Baseline": {
+          "n": 595,
+          "passCount": 539,
+          "failCount": 56,
+          "accuracy": 0.905882,
+          "failureRate": 0.094118,
+          "accuracyCp95": [
+            0.879522,
+            0.928121
+          ],
+          "condATotal": 396,
+          "condAFailCount": 5,
+          "condAFailRate": 0.012626,
+          "condAFailCp95TwoSidedUpper": 0.029218,
+          "condAFailCp95OneSidedUpper": 0.026364,
+          "condAK4PassLe5Of400": null,
+          "condBETotal": 199,
+          "condBEPassCount": 148,
+          "condBEFailCount": 51,
+          "condBEAccuracy": 0.743719,
+          "condBEFailureRate": 0.256281,
+          "condBEAccuracyCp95": [
+            0.677184,
+            0.802839
+          ],
+          "verdictCounts": {
+            "PASS": 539,
+            "PARSE_REJECT": 0,
+            "CONDITIONAL_ARITH_ERROR": 52,
+            "STALE_STATE_RETENTION": 2,
+            "OVER_RETRACTION": 2
+          },
+          "stalePlusOverCount": 4,
+          "truncatedCount": 0,
+          "perCondition": {
+            "A": {
+              "n": 396,
+              "pass": 391,
+              "fail": 5,
+              "verdicts": {
+                "PASS": 391,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 5,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "B": {
+              "n": 99,
+              "pass": 50,
+              "fail": 49,
+              "verdicts": {
+                "PASS": 50,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 47,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 2
+              }
+            },
+            "C": {
+              "n": 100,
+              "pass": 98,
+              "fail": 2,
+              "verdicts": {
+                "PASS": 98,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 2,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "D": {
+              "n": 0,
+              "pass": 0,
+              "fail": 0,
+              "verdicts": {
+                "PASS": 0,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "E": {
+              "n": 0,
+              "pass": 0,
+              "fail": 0,
+              "verdicts": {
+                "PASS": 0,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            }
+          }
+        },
+        "arm2LineageK2": {
+          "n": 595,
+          "passCount": 479,
+          "failCount": 116,
+          "accuracy": 0.805042,
+          "failureRate": 0.194958,
+          "accuracyCp95": [
+            0.770886,
+            0.836135
+          ],
+          "condATotal": 396,
+          "condAFailCount": 16,
+          "condAFailRate": 0.040404,
+          "condAFailCp95TwoSidedUpper": 0.064786,
+          "condAFailCp95OneSidedUpper": 0.060722,
+          "condAK4PassLe5Of400": null,
+          "condBETotal": 199,
+          "condBEPassCount": 99,
+          "condBEFailCount": 100,
+          "condBEAccuracy": 0.497487,
+          "condBEFailureRate": 0.502513,
+          "condBEAccuracyCp95": [
+            0.426002,
+            0.569049
+          ],
+          "verdictCounts": {
+            "PASS": 479,
+            "PARSE_REJECT": 0,
+            "CONDITIONAL_ARITH_ERROR": 98,
+            "STALE_STATE_RETENTION": 5,
+            "OVER_RETRACTION": 13
+          },
+          "stalePlusOverCount": 18,
+          "truncatedCount": 0,
+          "perCondition": {
+            "A": {
+              "n": 396,
+              "pass": 380,
+              "fail": 16,
+              "verdicts": {
+                "PASS": 380,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 3,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 13
+              }
+            },
+            "B": {
+              "n": 99,
+              "pass": 0,
+              "fail": 99,
+              "verdicts": {
+                "PASS": 0,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 94,
+                "STALE_STATE_RETENTION": 5,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "C": {
+              "n": 100,
+              "pass": 99,
+              "fail": 1,
+              "verdicts": {
+                "PASS": 99,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 1,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "D": {
+              "n": 0,
+              "pass": 0,
+              "fail": 0,
+              "verdicts": {
+                "PASS": 0,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            },
+            "E": {
+              "n": 0,
+              "pass": 0,
+              "fail": 0,
+              "verdicts": {
+                "PASS": 0,
+                "PARSE_REJECT": 0,
+                "CONDITIONAL_ARITH_ERROR": 0,
+                "STALE_STATE_RETENTION": 0,
+                "OVER_RETRACTION": 0
+              }
+            }
+          }
+        },
+        "stalePlusOverDeltaArm2MinusArm1": 14,
+        "mcnemar": {
+          "aBothPass": 472,
+          "bArm1FailArm2Pass": 7,
+          "cArm1PassArm2Fail": 67,
+          "dBothFail": 49,
+          "bMinusC": -60,
+          "bPlusC": 74,
+          "netGainOverN": -0.10084,
+          "netGainOver800": -0.075,
+          "twoSidedExactP": 2.1198660113131958e-13,
+          "k2GatePassItt800": false,
+          "beOnlyB": 2,
+          "beOnlyC": 51,
+          "beOnlyTwoSidedExactP": 3.1796787425264483e-13
+        }
+      },
+      "timing": {
+        "sumLoadSeconds": 560.19,
+        "sumTurn1EvalSeconds": 2384.4,
+        "sumArm1EvalSeconds": 3028.61,
+        "sumArm2EvalSeconds": 3630.53,
+        "maxShardWallSeconds": 5593.32,
+        "maxPeakTorchVramGiB": 16.85
+      }
+    }
+  ],
+  "branch2_open_weight_pooled_secondary": {
+    "ittN2400": {
+      "n": 2400,
+      "arm1PassCount": 1501,
+      "arm1Accuracy": 0.625417,
+      "arm1Verdicts": {
+        "PASS": 1501,
+        "PARSE_REJECT": 106,
+        "CONDITIONAL_ARITH_ERROR": 486,
+        "STALE_STATE_RETENTION": 194,
+        "OVER_RETRACTION": 113
+      },
+      "arm1StalePlusOver": 307,
+      "arm2PassCount": 1235,
+      "arm2Accuracy": 0.514583,
+      "arm2Verdicts": {
+        "PASS": 1235,
+        "PARSE_REJECT": 130,
+        "CONDITIONAL_ARITH_ERROR": 502,
+        "STALE_STATE_RETENTION": 16,
+        "OVER_RETRACTION": 517
+      },
+      "arm2StalePlusOver": 533,
+      "stalePlusOverDelta": 226,
+      "staleRetentionRelativeChange": -0.917526,
+      "mcnemar": {
+        "bArm1FailArm2Pass": 132,
+        "cArm1PassArm2Fail": 398,
+        "bMinusC": -266,
+        "netGainOver2400": -0.110833,
+        "twoSidedExactP": 5.35e-32
+      }
+    },
+    "cleanTurn1N2049": {
+      "n": 2049,
+      "arm1PassCount": 1451,
+      "arm1Accuracy": 0.70815,
+      "arm1Verdicts": {
+        "PASS": 1451,
+        "PARSE_REJECT": 2,
+        "CONDITIONAL_ARITH_ERROR": 386,
+        "STALE_STATE_RETENTION": 191,
+        "OVER_RETRACTION": 19
+      },
+      "arm1StalePlusOver": 210,
+      "arm2PassCount": 1174,
+      "arm2Accuracy": 0.572962,
+      "arm2Verdicts": {
+        "PASS": 1174,
+        "PARSE_REJECT": 27,
+        "CONDITIONAL_ARITH_ERROR": 420,
+        "STALE_STATE_RETENTION": 16,
+        "OVER_RETRACTION": 412
+      },
+      "arm2StalePlusOver": 428,
+      "stalePlusOverDelta": 218,
+      "mcnemar": {
+        "bArm1FailArm2Pass": 106,
+        "cArm1PassArm2Fail": 383,
+        "bMinusC": -277,
+        "netGainOver2049": -0.135188,
+        "twoSidedExactP": 7.99e-38
+      }
+    }
+  },
+  "manifest_body_sha256": "d46e4f217c1d47d85c08f35810efc8bb95303fa6845b184a884ccd81e0e78d25"
+}

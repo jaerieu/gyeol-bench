@@ -1,0 +1,193 @@
+{
+  "schema_version": "2.0.0",
+  "benchmark_package": "gyeol-bench",
+  "benchmark_version": "0.1.0",
+  "dataset_generator_version": "v2.0",
+  "task_identifier": "gyeol_bench/retraction_dag",
+  "inspect_evals_spec_date": "2026-05-08",
+  "license": "Apache-2.0",
+  "governance_grade": "[안전]",
+  "datasets": {
+    "main_eval_n800": {
+      "seed": 20261122,
+      "sample_count": 800,
+      "canonical_jsonl_sha256": "ffde279d40724f1e8091cbeed8becd3a1b07eae0be353768ab1644402e262330",
+      "conditions": {
+        "A": {
+          "count": 400,
+          "sha256": "9b8e95bceedeb2e4ae0b5e05d2ec5bd3bc8cce5731fe7598db24e314880d7ad3"
+        },
+        "B": {
+          "count": 100,
+          "sha256": "aaf5f65c75482b78588991a380c74e298191a9469f67059e9d6175acb3baf11f"
+        },
+        "C": {
+          "count": 100,
+          "sha256": "c16971e422aa592aff1dbc81fd2c84620d91a1bb953d4fbbb7496eccb4796b9a"
+        },
+        "D": {
+          "count": 100,
+          "sha256": "8fa68c00ba4654258eddaa33a703247ccdd6f65755e071ed2766073085f22775"
+        },
+        "E": {
+          "count": 100,
+          "sha256": "f1f0a387ae8f57d6032ad1e6fbb31a9944841a62102e3d9bc2b0f070573f87f3"
+        }
+      }
+    },
+    "pilot_k3_n50": {
+      "seed": 20261150,
+      "sample_count": 50,
+      "canonical_jsonl_sha256": "688080891ff978c579b2eac121853aa84372c89077199f977cb98c539bdb9f74"
+    },
+    "pr_challenge_validation_n160": {
+      "seed": 20261199,
+      "sample_count": 160,
+      "canonical_jsonl_sha256": "4b6fbb6eb199727933fca1903efe464142d35b037bafaf766c64e2261b94f4f5"
+    }
+  },
+  "repository_files": {
+    "pyproject.toml": {
+      "role": "package_metadata",
+      "sha256": "74f6bdca29e461e08e7944a0e581164df5b0a9c5d84555338c9fb5cb902a68b5"
+    },
+    "eval.yaml": {
+      "role": "inspect_eval_spec",
+      "sha256": "ea05c3fe65cc7f2849b9c318d720f3ada7fee9c73ef4e2316bc48f59250afaef"
+    },
+    "gyeol_bench/oracle.py": {
+      "role": "oracle_and_adapter",
+      "sha256": "fe56542c9f0d2b01ecbc892580049222305b6e04ff561e13c22e601582beea22"
+    },
+    "gyeol_bench/_registry.py": {
+      "role": "inspect_registry_and_scorer",
+      "sha256": "5943856715d143028c20d6e4a67ba0f859739655b267169ae968bc1f2cf253e0"
+    },
+    "gyeol_bench/__init__.py": {
+      "role": "package_init",
+      "sha256": "16b9115485442f4f9b66279696390801bba2f0f1f74d418309efdf91ff13e5a2"
+    },
+    "scripts/check_zero_core.py": {
+      "role": "zero_core_static_guard",
+      "sha256": "1b2341baf1a5e5945ed3384628987207be669afbed2df47de16f35d83360502f"
+    },
+    "audit_packet/ANNOTATOR_RUBRIC.md": {
+      "role": "human_audit_rubric",
+      "sha256": "aca10993df4ea3cd1231df6e1e8a25080b6f148fe704f5a31f44ae58b66c0cfd"
+    },
+    "audit_packet/SEALED_KEY_COMMITMENT.json": {
+      "role": "human_audit_commitment",
+      "sha256": "ae8cb8c294fee5d6a37f94e9199457e94e34677b7b0b06e66c78f48e976a9886"
+    },
+    "audit_packet/blinded_annotator_sheet_n160.jsonl": {
+      "role": "human_audit_blinded_jsonl",
+      "sha256": "b8f0e53e2d4573e5e05ef6d1832807ccfdab4fd84ff7a601ee6c82a655f2d017"
+    },
+    "audit_packet/blinded_annotator_sheet_n160.csv": {
+      "role": "human_audit_blinded_csv",
+      "sha256": "69d26273fcac02d4e2fe4fa8550006ba146247ffa2db46a5d5a7f27e4d976755"
+    },
+    "manifests/DAY46_PR_CHALLENGE.md": {
+      "role": "pr_challenge_protocol",
+      "sha256": "d96313ddef642cd312cdbcaa126cc75fdded6ea7a2c31a8e38b08bd795038b56"
+    },
+    "manifests/v3-multiturn-prepilot-lock.json": {
+      "role": "v3_multiturn_prepilot_lock",
+      "sha256": "54aa23546c8e6c85fa16820bb413f4698312db469d7d1ddd81483f76ccbf7a8f"
+    },
+    "agent_artefacts/retraction_dag_0.1.0/validity/SATURATION_REPORT.md": {
+      "role": "frontier_saturation_report",
+      "sha256": "b4411f037083eb98745078bd57f742365821b674a5c227fb194d2cfabfd031ab"
+    }
+  },
+  "external_human_audit_commitment": {
+    "total_audit_items": 160,
+    "blinded_jsonl_sha256": "b8f0e53e2d4573e5e05ef6d1832807ccfdab4fd84ff7a601ee6c82a655f2d017",
+    "sealed_answer_key_sha256": "3a85aca23eddc51973e56aea130efa2fa250c252c498563fac907912cc5bb799"
+  },
+  "pr_challenge": {
+    "freeze_milestone": "Day-46",
+    "evaluation_lock_milestone": "Day-60",
+    "challenge_window_days": 14,
+    "challenge_window_hours": 336,
+    "target_repository": "jaerieu/gyeol-bench",
+    "dataset_generator_version": "v2.0",
+    "baseline_system_prompt_id": "v2.0-day46",
+    "baseline_system_prompt_sha256": "ae0a0de3d33569b586726c689ed3e009ab458f9bedd9b9ffb04b39df4c83b7ad",
+    "invariants": [
+      "identical_pinned_model_and_token_thinking_budget",
+      "single_pass_inference_without_external_code_execution_in_unassisted_arm",
+      "unmodified_response_adapter_standalone_json_gate_with_optional_string_notes",
+      "zero_seed_20261122_or_20261199_leakage_in_prompts_or_exemplars",
+      "strict_accuracy_gain_on_seed_20261199_without_parse_reject_or_condition_a_regression"
+    ],
+    "day46_pr_validation_gate_n160": {
+      "held_out_validation_seed": 20261199,
+      "held_out_validation_count": 160,
+      "held_out_validation_sha256": "4b6fbb6eb199727933fca1903efe464142d35b037bafaf766c64e2261b94f4f5",
+      "max_b_plus_c": 160,
+      "min_b_minus_c_for_adoption": 1,
+      "two_sided_exact_mcnemar_role": "diagnostic_tie_breaker_on_n160"
+    },
+    "day60_final_evaluation_gates_n800": {
+      "evaluation_seed": 20261122,
+      "evaluation_count": 800,
+      "K2_min_net_gain_proportion": 0.05,
+      "K2_min_b_minus_c_at_n800": 40,
+      "K2_mcnemar_two_sided_p_lt": 0.05,
+      "K2_max_b_plus_c_at_b_minus_c_40": 396,
+      "K2_discordant_manual_audit_ratio": 1.0,
+      "K2_concordant_stratified_audit_n": 50,
+      "K2_external_human_audit_min_n": 150,
+      "K2_external_human_audit_prepared_n": 160,
+      "K3_min_top_model_failure_rate": 0.1,
+      "K4_control_n": 400,
+      "K4_max_false_alarms": 5,
+      "K4_max_false_alarm_rate": 0.0125,
+      "K4_clopper_pearson_95_upper": 0.028928,
+      "frontier_tier_status": "Option_C_Halted_At_Zero_Phase3_Spend_KV_ReReference_Saturation_Control",
+      "primary_k2_cohort": "open_weight_14b_to_24b_nf4_three_families",
+      "population_hierarchy": [
+        "ITT_N800_primary",
+        "Clean_T1_sensitivity"
+      ],
+      "co_primary_outcomes": [
+        "turn2_overall_accuracy_delta_b_minus_c",
+        "stale_plus_over_retraction_count_delta"
+      ]
+    }
+  },
+  "rfc6962_merkle": {
+    "hash_algorithm": "SHA-256",
+    "leaf_prefix_hex": "00",
+    "interior_prefix_hex": "01",
+    "leaf_count": 23,
+    "merkle_root_hex": "d54cc303f3ab11521356e563610da53b799d6b9d9619017d51de43a08ee6a634",
+    "leaf_hashes_hex": [
+      "42c8c7c6abd4856858f100490d11098cb246d8a52131ae0f0c27f284278bc01e",
+      "b26e99c55c4c33cb02018681b21e8146153655f05e1030bed1773c5a2f343b2c",
+      "2c07b2459329ee538545172c0e38057bdffc9bd0735df10ad3cf58e7e0b680e5",
+      "19155adca7e2bd1f6ab1c4e7916e7e83e98559803d21fc30e16fceb65702062e",
+      "fa23c436ffb19ae22be5c3caf5eeb99b2ab1202482268d0a13d44093f934feff",
+      "38e3a7490c566f30c9dca185d9170c7479a211fbc0e10df7250f5f76cd54f022",
+      "a11cf88b4766cb59d5839fe42ef01fd4e4c111766716095822a31da3644482f7",
+      "41d281df2c365b135c88614b5c07dfefbf058026fa94b7fefa4820d92fc67ef7",
+      "91b105899b2380b0d7420a7fe8fc0b6058b302e478bb3e7feae2629915bea741",
+      "d65839e036f7be30b68eae6b6945d22c1f1527e189437fd6259d0ac9899d4dc5",
+      "58c8c67c60adb96673c96e8c428311b5876de74377c9f1145097dc4737c0a98d",
+      "e99fe1e057b571d2ae3da038ce623199df671e233dc290a6c2d6c58c4d4c43cb",
+      "7ca8632ffbcfd585a591c3d2adbd2fa67ac3732dd0ac76beeef7540f70a1eaee",
+      "537b983790c71217dcae8e5dd6eea30fdd5b115a324bb407fcb64ef08cdf296c",
+      "329ccd5a1e4ce8da3f80277b9cd9e52c9b24fb2d641e035124d4c50216c64283",
+      "46da0910f0d117b0b11f9fb5f6bb9cdf2a6e74b91056e06d69cc0632df9c11fc",
+      "0bf0df62230fd9fb2e04c9de5c8a7496f61a1c91cdcfec211774df4d5dda2f32",
+      "f6bfca8e93b8d2b9b0616c0ace7bdc06f2dc269d22f9110f70594c713a7d4e32",
+      "ca9ab95d312cf7a954c6512772a87794841f6ef491dc08fd05cd51dac1bcca56",
+      "f1b4dcf8fd1fa155e3c25408dee0e958eb5ad88eeb1c620832dfbb3a4e0e005a",
+      "b3528b876ada9ea57c2c4bb823507462135c121028f969edf34933a417a0748c",
+      "f02553f1868c48e90b87fb5b9909315cf62786be22ee4e6bf8a1de0feba57cec",
+      "482295b45310427d47992410f8d230d2ab9d7f9281ed7ff59aa50a9a8bacf87d"
+    ]
+  },
+  "manifest_body_sha256": "a542492ed604bd2b3b2b0e02e0fde3c6c8ee856082f3e27d952f55a74ada68d4"
+}

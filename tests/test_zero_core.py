@@ -1,4 +1,4 @@
-"""Unit tests for gyeol-bench clean-room Fraction oracle, PARSE_REJECT gate, and zero-core checker."""
+"""Unit tests for gyeol-bench v2.0 Fraction oracle, partial STALE_STATE_RETENTION, notes validation, and zero-core checker."""
 
 from __future__ import annotations
 
@@ -17,14 +17,18 @@ if str(REPO_ROOT) not in sys.path:
 from gyeol_bench import (
     DimensionMismatchError,
     ExactRationalOracle,
+    MultiTurnEpisode,
     TurnSpec,
+    evaluate_multiturn_episode,
     evaluate_retraction_episode,
+    generate_multiturn_dataset,
     generate_procedural_dataset,
     mixed_tolerance_match,
     parse_step_envelope,
     response_adapter,
 )
-from gyeol_bench._registry import retraction_dag
+from gyeol_bench._registry import retraction_dag, retraction_dag_multiturn
+from gyeol_bench.oracle import _compute_stale_targets, convert_from_base_fraction
 
 CHECKER_PATH = REPO_ROOT / "scripts" / "check_zero_core.py"
 
@@ -78,9 +82,9 @@ class TestZeroCoreAndOracle(unittest.TestCase):
                 unit="mg",
             ),
         ]
-        # (1500 mg + 2 g) * 3 = 3.5 g * 3 = 10.5 g = 10500 mg
         good_json = json.dumps(
             {
+                "notes": "1500 mg + 2 g = 3.5 g; * 3 = 10.5 g",
                 "step_id": "d2",
                 "value": 10.5,
                 "unit": "g",
@@ -92,7 +96,7 @@ class TestZeroCoreAndOracle(unittest.TestCase):
         self.assertEqual(res.verdict, "PASS")
         self.assertEqual(res.truth_target_fraction, Fraction(21, 2))
 
-        # Equivalent answer reported in mg also aligns via exact base-unit conversion
+        # Optional notes omitted remains valid for backwards compatibility
         mg_json = json.dumps(
             {
                 "step_id": "d2",
@@ -126,6 +130,56 @@ class TestZeroCoreAndOracle(unittest.TestCase):
         self.assertFalse(res_arith.ok)
         self.assertEqual(res_arith.verdict, "CONDITIONAL_ARITH_ERROR")
 
+    def test_downward_closed_partial_stale_state_retention(self) -> None:
+        turns = [
+            TurnSpec("p1", "premise", 100, "g"),
+            TurnSpec("p2", "premise", 50, "g"),
+            TurnSpec("p3", "premise", 40, "g"),
+            TurnSpec("d1", "derive", arith_op="add", left_id="p1", right_id="p2"),
+            TurnSpec("d2", "derive", arith_op="add", left_id="d1", right_id="p3"),
+            TurnSpec("p1_r1", "retract", 200, "g", retraction_op="fix->", target_id="p1"),
+            TurnSpec("p3_r1", "retract", 90, "g", retraction_op="err->", target_id="p3"),
+            TurnSpec("p1_r2", "retract", 350, "g", retraction_op="sup->", target_id="p1_r1"),
+        ]
+        # Active truth: 350 + 50 + 90 = 490 g, retracted_ids = ["p1", "p1_r1", "p3"]
+        # Downward-closed partial stale states:
+        # 1) Drop {p1_r2} -> 200 + 50 + 90 = 340 g
+        # 2) Drop {p1_r1, p1_r2} -> 100 + 50 + 90 = 240 g
+        # 3) Drop {p3_r1} -> 350 + 50 + 40 = 440 g
+        # 4) Drop {p1_r2, p3_r1} -> 200 + 50 + 40 = 290 g
+        # 5) Drop {p1_r1, p1_r2, p3_r1} -> 100 + 50 + 40 = 190 g
+        for partial_val in (340.0, 240.0, 440.0, 290.0, 190.0):
+            payload = json.dumps(
+                {
+                    "notes": "partial trace",
+                    "step_id": "d2",
+                    "value": partial_val,
+                    "unit": "g",
+                    "retracted_ids": ["p1", "p1_r1", "p3", "extra_spurious"],
+                }
+            )
+            res = evaluate_retraction_episode(turns, payload, target_node_id="d2", expected_unit="g")
+            self.assertFalse(res.ok)
+            self.assertEqual(
+                res.verdict,
+                "STALE_STATE_RETENTION",
+                msg=f"Expected STALE_STATE_RETENTION before OVER_RETRACTION for {partial_val}",
+            )
+
+        ok_payload = json.dumps(
+            {
+                "notes": "350 + 50 + 90 = 490",
+                "step_id": "d2",
+                "value": 490.0,
+                "unit": "g",
+                "retracted_ids": ["p1", "p1_r1", "p3"],
+            }
+        )
+        self.assertEqual(
+            evaluate_retraction_episode(turns, ok_payload, target_node_id="d2", expected_unit="g").verdict,
+            "PASS",
+        )
+
     def test_financial_scale_vs_meter_disambiguation(self) -> None:
         oracle = ExactRationalOracle()
         oracle.append_turn(TurnSpec(node_id="rev", kind="premise", value="5.2", unit="M_USD"))
@@ -134,13 +188,20 @@ class TestZeroCoreAndOracle(unittest.TestCase):
         with self.assertRaises(DimensionMismatchError):
             oracle.evaluate()
 
-    def test_parse_reject_gate_and_mixed_tolerance(self) -> None:
+    def test_parse_reject_gate_notes_type_and_mixed_tolerance(self) -> None:
+        valid_with_notes = '{"notes": "step trace", "step_id": "d2", "value": 10.5, "unit": "g", "retracted_ids": []}'
+        self.assertTrue(response_adapter(valid_with_notes).ok)
+
         for bad_raw in [
             "The answer is 10.5 g.",
             '{"step_id": "d2", "value": true, "unit": "g", "retracted_ids": []}',
             '{"step_id": "d2", "value": NaN, "unit": "g", "retracted_ids": []}',
             '{"step_id": "d2", "value": 10.5}',
             '{"step_id": "d2", "value": 10.5, "unit": "g", "retracted_ids": [], "preserved": "bad"}',
+            '{"notes": 123, "step_id": "d2", "value": 10.5, "unit": "g", "retracted_ids": []}',
+            '{"notes": ["list"], "step_id": "d2", "value": 10.5, "unit": "g", "retracted_ids": []}',
+            '{"notes": null, "step_id": "d2", "value": 10.5, "unit": "g", "retracted_ids": []}',
+            '{"notes": true, "step_id": "d2", "value": 10.5, "unit": "g", "retracted_ids": []}',
         ]:
             for gate in (parse_step_envelope, response_adapter):
                 parsed = gate(bad_raw)
@@ -153,18 +214,36 @@ class TestZeroCoreAndOracle(unittest.TestCase):
         self.assertTrue(ok_in)
         self.assertFalse(ok_out)
 
-    def test_n800_five_conditions_and_four_way_error_split(self) -> None:
+    def test_n800_v2_five_conditions_depths_and_four_way_error_split(self) -> None:
         ds = generate_procedural_dataset(seed=20261122, count=800)
         self.assertEqual(len(ds), 800)
         self.assertEqual(sum(1 for e in ds if e.category == "normal"), 400)
         self.assertEqual(sum(1 for e in ds if e.category == "perturbed"), 400)
         for cond, expected_n in [("A", 400), ("B", 100), ("C", 100), ("D", 100), ("E", 100)]:
-            self.assertEqual(sum(1 for e in ds if e.condition == cond), expected_n)
+            sub = [e for e in ds if e.condition == cond]
+            self.assertEqual(len(sub), expected_n)
+            for ep in sub:
+                d_hops = sum(
+                    1 for t in ep.turns if t.kind == "derive" and t.node_id.startswith("d") and t.node_id != "d_indep"
+                )
+                if cond == "A":
+                    self.assertEqual(len(ep.turns), 17)
+                    self.assertEqual(d_hops, 4)
+                    self.assertEqual(ep.expected_retracted_ids, ())
+                else:
+                    self.assertGreaterEqual(d_hops, 8)
+                    self.assertEqual(len(ep.expected_retracted_ids), 3)
 
         by_cond = {cond: next(e for e in ds if e.condition == cond) for cond in ("A", "B", "C", "D", "E")}
 
         def _score(ep, value, retracted_ids, preserved=None, unit=None):
-            body = {"step_id": ep.target_node_id, "value": value, "unit": unit or ep.expected_unit, "retracted_ids": retracted_ids}
+            body = {
+                "notes": "trace",
+                "step_id": ep.target_node_id,
+                "value": value,
+                "unit": unit or ep.expected_unit,
+                "retracted_ids": retracted_ids,
+            }
             if preserved is not None:
                 body["preserved"] = preserved
             return evaluate_retraction_episode(
@@ -177,11 +256,22 @@ class TestZeroCoreAndOracle(unittest.TestCase):
         self.assertEqual(_score(ep_a, ep_a.expected_value_float + 5, []).verdict, "CONDITIONAL_ARITH_ERROR")
         self.assertEqual(_score(ep_a, ep_a.expected_value_float, ["p1"]).verdict, "OVER_RETRACTION")
 
-        self.assertEqual(by_cond["C"].target_node_id, "d3")
+        self.assertIn(by_cond["C"].target_node_id, {"d10", "d12"})
         for cond in ("B", "C", "D"):
             ep = by_cond[cond]
             self.assertEqual(_score(ep, ep.expected_value_float, list(ep.expected_retracted_ids)).verdict, "PASS")
             self.assertEqual(_score(ep, ep.pre_retraction_value_float, []).verdict, "STALE_STATE_RETENTION")
+
+            oracle_c = ExactRationalOracle()
+            for t in ep.turns:
+                oracle_c.append_turn(t)
+            snap_c = oracle_c.evaluate()
+            bf, dim, _ = snap_c.active_values_base[ep.target_node_id]
+            tf = convert_from_base_fraction(bf, dim, ep.expected_unit)
+            stales = _compute_stale_targets(ep.turns, ep.target_node_id, ep.expected_unit, dim, tf)
+            self.assertEqual(len(stales), 5)
+            for st in stales:
+                self.assertEqual(_score(ep, float(st), list(ep.expected_retracted_ids)).verdict, "STALE_STATE_RETENTION")
 
         ep_e = by_cond["E"]
         pres_map = dict(ep_e.preserved_targets)
@@ -193,11 +283,12 @@ class TestZeroCoreAndOracle(unittest.TestCase):
         from gyeol_bench.oracle import UNIT_TABLE
         iu = pres_map["d_indep"]
         iv = float(indep_base / UNIT_TABLE[iu][1])
+        ret_e = list(ep_e.expected_retracted_ids)
 
-        self.assertEqual(_score(ep_e, ep_e.expected_value_float, ["p1"], {"d_indep": {"value": iv, "unit": iu}}).verdict, "PASS")
-        self.assertEqual(_score(ep_e, ep_e.expected_value_float, ["p1"], {"d_indep": {"value": iv + 10.0, "unit": iu}}).verdict, "OVER_RETRACTION")
-        self.assertEqual(_score(ep_e, ep_e.expected_value_float, ["p1", "d_indep"], {"d_indep": {"value": iv, "unit": iu}}).verdict, "OVER_RETRACTION")
-        self.assertEqual(_score(ep_e, ep_e.expected_value_float, ["p1"]).verdict, "PARSE_REJECT")
+        self.assertEqual(_score(ep_e, ep_e.expected_value_float, ret_e, {"d_indep": {"value": iv, "unit": iu}}).verdict, "PASS")
+        self.assertEqual(_score(ep_e, ep_e.expected_value_float, ret_e, {"d_indep": {"value": iv + 10.0, "unit": iu}}).verdict, "OVER_RETRACTION")
+        self.assertEqual(_score(ep_e, ep_e.expected_value_float, ret_e + ["d_indep"], {"d_indep": {"value": iv, "unit": iu}}).verdict, "OVER_RETRACTION")
+        self.assertEqual(_score(ep_e, ep_e.expected_value_float, ret_e).verdict, "PARSE_REJECT")
 
     def test_retraction_dag_registration_balance(self) -> None:
         task_obj = retraction_dag(seed=20261122, sample_count=16)
@@ -209,6 +300,75 @@ class TestZeroCoreAndOracle(unittest.TestCase):
             self.assertEqual(len(task_obj.dataset), 16)
             for cond, exp_n in [("A", 8), ("B", 2), ("C", 2), ("D", 2), ("E", 2)]:
                 self.assertEqual(sum(1 for s in task_obj.dataset if (s.metadata or {}).get("condition") == cond), exp_n)
+
+    def test_v3_multiturn_dataset_and_stale_turn1_node_substitution(self) -> None:
+        ds = generate_multiturn_dataset(seed=20261122, count=800)
+        self.assertEqual(len(ds), 800)
+        for cond, expected_n in [("A", 400), ("B", 100), ("C", 100), ("D", 100), ("E", 100)]:
+            sub = [e for e in ds if e.condition == cond]
+            self.assertEqual(len(sub), expected_n)
+            for ep in sub:
+                self.assertIsInstance(ep, MultiTurnEpisode)
+                self.assertEqual(ep.turn1_target_id, "d4")
+                self.assertEqual(ep.target_node_id, "d6")
+                self.assertNotIn("Turn 1.", ep.turn2_prompt)
+                self.assertLessEqual(len(ep.turn1_prompt) / 3.6, 300.0)
+                if cond == "A":
+                    self.assertEqual(ep.expected_retracted_ids, ())
+                    self.assertEqual(ep.stale_target_values_float, ())
+                else:
+                    self.assertGreaterEqual(len(ep.stale_target_values_float), 6)
+
+        by_cond = {c: next(e for e in ds if e.condition == c) for c in ("A", "B", "C", "D", "E")}
+
+        def _score_mt(ep: MultiTurnEpisode, val: float, ret_ids, preserved=None):
+            payload = {
+                "notes": "turn 2 trace",
+                "step_id": "d6",
+                "value": val,
+                "unit": ep.expected_unit,
+                "retracted_ids": ret_ids,
+            }
+            if preserved is not None:
+                payload["preserved"] = preserved
+            return evaluate_multiturn_episode(
+                ep.turn1_turns, ep.turn2_turns, json.dumps(payload),
+                target_node_id="d6", expected_unit=ep.expected_unit,
+                preserved_targets=dict(ep.preserved_targets) or None,
+            )
+
+        # Verify frozen Turn-1 d4-only, d2-only, and {d4, d2} substitutions trigger STALE_STATE_RETENTION
+        for cond in ("B", "C", "D"):
+            ep = by_cond[cond]
+            self.assertEqual(_score_mt(ep, ep.expected_value_float, list(ep.expected_retracted_ids)).verdict, "PASS")
+            for sv in ep.stale_target_values_float:
+                res_st = _score_mt(ep, sv, list(ep.expected_retracted_ids) + ["spurious_id"])
+                self.assertEqual(res_st.verdict, "STALE_STATE_RETENTION")
+
+        ep_e = by_cond["E"]
+        o_e = ExactRationalOracle()
+        for t in ep_e.all_turns:
+            o_e.append_turn(t)
+        snap_e = o_e.evaluate()
+        iu = dict(ep_e.preserved_targets)["d_indep"]
+        iv = float(convert_from_base_fraction(*snap_e.active_values_base["d_indep"][:2], iu))
+        self.assertEqual(
+            _score_mt(ep_e, ep_e.expected_value_float, list(ep_e.expected_retracted_ids), {"d_indep": {"value": iv, "unit": iu}}).verdict,
+            "PASS",
+        )
+        for sv in ep_e.stale_target_values_float:
+            self.assertEqual(
+                _score_mt(ep_e, sv, list(ep_e.expected_retracted_ids), {"d_indep": {"value": iv + 50.0, "unit": iu}}).verdict,
+                "STALE_STATE_RETENTION",
+            )
+
+        for arm in ("baseline", "lineage_k2"):
+            mt_task = retraction_dag_multiturn(seed=20261151, sample_count=16, arm=arm)
+            if isinstance(mt_task, dict):
+                self.assertEqual(mt_task["sample_count"], 16)
+                self.assertEqual(mt_task["conditions"], {"A": 8, "B": 2, "C": 2, "D": 2, "E": 2})
+            else:
+                self.assertEqual(len(mt_task.dataset), 16)
 
 
 if __name__ == "__main__":
