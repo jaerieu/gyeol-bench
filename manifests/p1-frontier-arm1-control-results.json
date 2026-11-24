@@ -1,0 +1,159 @@
+{
+  "schema_version": "p1-frontier-arm1-control-v1",
+  "harness": "standard_2_turn_arm1",
+  "seed": 20261122,
+  "count": 50,
+  "updated_at": "2026-11-24T09:53:48.591393+00:00",
+  "models": {
+    "models/gemini-4-carbon": {
+      "mode": "live",
+      "model": "models/gemini-4-carbon",
+      "seed": 20261122,
+      "count": 50,
+      "condition_counts": {
+        "A": 25,
+        "B": 7,
+        "C": 6,
+        "D": 6,
+        "E": 6
+      },
+      "batches": {
+        "t1": "batches/4dcuzoj3m6ggij22rquqnmsc2obuuma32dkg",
+        "t2": "batches/0urveuisebh16tcgatf6k7egoq1ktwobtwsp"
+      },
+      "finish_reason_max_tokens": 0,
+      "usageMetadata": {
+        "promptTokenCount": 85732,
+        "candidatesTokenCount": 15543,
+        "thoughtsTokenCount": 15678
+      },
+      "run_spend_usd": 0.031592,
+      "uncached_spend_delta_usd": 0.031592,
+      "cumulative_spend_usd": 1.667162,
+      "t1_clean_count": 50,
+      "itt": {
+        "n": 50,
+        "pass": 50,
+        "fail": 0,
+        "pass_rate": 1.0,
+        "pass_ci95": [
+          0.928878,
+          1.0
+        ],
+        "stale_count": 0,
+        "stale_rate": 0.0,
+        "stale_ci95": [
+          0.0,
+          0.071122
+        ],
+        "verdicts": {
+          "PASS": 50,
+          "PARSE_REJECT": 0,
+          "CONDITIONAL_ARITH_ERROR": 0,
+          "STALE_STATE_RETENTION": 0,
+          "OVER_RETRACTION": 0
+        }
+      },
+      "clean_t1": {
+        "n": 50,
+        "pass": 50,
+        "fail": 0,
+        "pass_rate": 1.0,
+        "pass_ci95": [
+          0.928878,
+          1.0
+        ],
+        "stale_count": 0,
+        "stale_rate": 0.0,
+        "stale_ci95": [
+          0.0,
+          0.071122
+        ],
+        "verdicts": {
+          "PASS": 50,
+          "PARSE_REJECT": 0,
+          "CONDITIONAL_ARITH_ERROR": 0,
+          "STALE_STATE_RETENTION": 0,
+          "OVER_RETRACTION": 0
+        }
+      },
+      "condition_a_fail": 0,
+      "condition_be_fail": 0
+    },
+    "models/gemini-4-hydrogen": {
+      "mode": "live",
+      "model": "models/gemini-4-hydrogen",
+      "seed": 20261122,
+      "count": 50,
+      "condition_counts": {
+        "A": 25,
+        "B": 7,
+        "C": 6,
+        "D": 6,
+        "E": 6
+      },
+      "batches": {
+        "t1": "batches/l9rap1cy0ck0e0o5tay2uets6kq5zs4xv4a0",
+        "t2": "batches/0pkhig5ktto7p2fke4pshtgcyfe656wgefh5"
+      },
+      "finish_reason_max_tokens": 0,
+      "usageMetadata": {
+        "promptTokenCount": 85443,
+        "candidatesTokenCount": 14518,
+        "thoughtsTokenCount": 36580
+      },
+      "run_spend_usd": 0.181147,
+      "uncached_spend_delta_usd": 0.181147,
+      "cumulative_spend_usd": 2.591743,
+      "t1_clean_count": 50,
+      "itt": {
+        "n": 50,
+        "pass": 50,
+        "fail": 0,
+        "pass_rate": 1.0,
+        "pass_ci95": [
+          0.928878,
+          1.0
+        ],
+        "stale_count": 0,
+        "stale_rate": 0.0,
+        "stale_ci95": [
+          0.0,
+          0.071122
+        ],
+        "verdicts": {
+          "PASS": 50,
+          "PARSE_REJECT": 0,
+          "CONDITIONAL_ARITH_ERROR": 0,
+          "STALE_STATE_RETENTION": 0,
+          "OVER_RETRACTION": 0
+        }
+      },
+      "clean_t1": {
+        "n": 50,
+        "pass": 50,
+        "fail": 0,
+        "pass_rate": 1.0,
+        "pass_ci95": [
+          0.928878,
+          1.0
+        ],
+        "stale_count": 0,
+        "stale_rate": 0.0,
+        "stale_ci95": [
+          0.0,
+          0.071122
+        ],
+        "verdicts": {
+          "PASS": 50,
+          "PARSE_REJECT": 0,
+          "CONDITIONAL_ARITH_ERROR": 0,
+          "STALE_STATE_RETENTION": 0,
+          "OVER_RETRACTION": 0
+        }
+      },
+      "condition_a_fail": 0,
+      "condition_be_fail": 0
+    }
+  }
+}

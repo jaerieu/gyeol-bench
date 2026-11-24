@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0.0",
+  "task_identifier": "gyeol_bench/retraction_dag",
+  "governance_grade": "[안전]",
+  "dataset_seed": 20261122,
+  "dataset_total_episodes": 800,
+  "audit_sampling_seed": 20261146,
+  "total_audit_items": 160,
+  "minimum_required_items": 150,
+  "stratification_counts": {
+    "A": 40,
+    "B": 30,
+    "C": 30,
+    "D": 30,
+    "E": 30
+  },
+  "zero_error_one_sided_95pct_upper_bound_at_150": 0.019773,
+  "zero_error_one_sided_95pct_upper_bound_at_160": 0.018549,
+  "blinded_jsonl_path": "audit_packet/blinded_annotator_sheet_n160.jsonl",
+  "blinded_jsonl_sha256": "b8f0e53e2d4573e5e05ef6d1832807ccfdab4fd84ff7a601ee6c82a655f2d017",
+  "blinded_csv_path": "audit_packet/blinded_annotator_sheet_n160.csv",
+  "blinded_csv_sha256": "69d26273fcac02d4e2fe4fa8550006ba146247ffa2db46a5d5a7f27e4d976755",
+  "sealed_answer_key_sha256": "3a85aca23eddc51973e56aea130efa2fa250c252c498563fac907912cc5bb799",
+  "blinding_guarantees": [
+    "All ground-truth target values, rational numerators/denominators, and pre-retraction values are stripped.",
+    "All ground-truth retracted_ids and preserved subgraph numeric answers are stripped.",
+    "Factorial condition labels (A..E) and normal/perturbed category labels are stripped and shuffled.",
+    "Sealed answer key is stored out-of-repository and bound via sealed_answer_key_sha256."
+  ]
+}

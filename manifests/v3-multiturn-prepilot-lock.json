@@ -1,0 +1,75 @@
+{
+  "schema_version": "3.0.0",
+  "lock_stage": "pre_v3_live_pilot",
+  "governance_grade": "[안전]",
+  "primary_task": "gyeol_bench/retraction_dag_multiturn",
+  "ablation_zero_task": "gyeol_bench/retraction_dag",
+  "k3_redraw_accounting": {
+    "total_allowed_redraws": 1,
+    "consumed_by_v3_transition": 1,
+    "remaining_post_freeze_redraws": 0,
+    "fallback_on_v3_pilot_saturation": "Option_C_Clean_Archive_Halt"
+  },
+  "source_files_sha256": {
+    "gyeol_bench/oracle.py": "fe56542c9f0d2b01ecbc892580049222305b6e04ff561e13c22e601582beea22",
+    "gyeol_bench/_registry.py": "5943856715d143028c20d6e4a67ba0f859739655b267169ae968bc1f2cf253e0",
+    "gyeol_bench/__init__.py": "16b9115485442f4f9b66279696390801bba2f0f1f74d418309efdf91ff13e5a2",
+    "eval.yaml": "ea05c3fe65cc7f2849b9c318d720f3ada7fee9c73ef4e2316bc48f59250afaef",
+    "scripts/check_zero_core.py": "1b2341baf1a5e5945ed3384628987207be669afbed2df47de16f35d83360502f"
+  },
+  "locked_system_prompts": {
+    "v3.0-multiturn-baseline": {
+      "sha256": "50e63ce68ecbc6901a59529ba10bc5f64a61063791784cfaaf302e29f4b2d92c",
+      "text": "You are a precise multi-turn quantitative reasoning assistant. Across sequential user turns:\n1. Track all base premises and their exact units (SI mass ug/mg/g/kg, length mm/cm/m/km, volume uL/mL/L, time ms/s/min/h, USD financial scales USD/K_USD/M_USD/B_USD, percentages %, and basis points bps), ignoring inert context or distractor notes unrelated to the target node.\n2. Whenever a retraction step (fix->, err->, or sup->) supersedes an earlier node (including chained retractions such as sup-> p1_r1), record ONLY unique node IDs appearing directly on the left of ':=' in \"retracted_ids\" sorted alphabetically (never include un-superseded replacement turn IDs or derived d* nodes; output [] if zero retractions occur), and recompute every downstream derived node from earlier turns that depends on it using exact dimensional conversion.\n3. Keep any independent derived subgraph (such as d_indep) that has no directed dependency on a retracted node strictly unchanged in \"preserved\" when requested.\n4. On every turn, output ONLY a single standalone valid JSON object starting with \"notes\" (containing a concise step-by-step calculation and retraction trace) followed by \"step_id\", \"value\", \"unit\", \"retracted_ids\" (and \"preserved\" when requested), with zero surrounding prose or markdown fences."
+    },
+    "v3.0-multiturn-lineage-k2": {
+      "sha256": "4d2f49fd0861324ea144f6a84d861d3a63ab63033a5df5f0957aaf62ec3e1484",
+      "text": "You are a lineage-verified multi-turn quantitative reasoning engine. Enforce strict dependency-graph taint invalidation across sequential user turns:\n1. In Turn 1 \"notes\", record an explicit ancestor ledger for every derived node (e.g., d1<-{p1,p2}; d2<-{p1,p2,p3}; d3<-{...}; d4<-{...}; d_indep<-{u1,u2,u3}) alongside canonical base-unit values (g, m, L, s, USD, scalar).\n2. In Turn 2 \"notes\", BEFORE evaluating d5 or d6: (a) extract the exact sorted set R of superseded target IDs appearing directly on the left of ':=' in any fix->, err->, or sup-> step (output R=[] if none, never include un-superseded replacement IDs or derived d* IDs); (b) mark as TAINTED every Turn-1 derived node whose ancestor set intersects R, and NEVER reuse a committed Turn-1 numeric value for any TAINTED node; (c) rebuild every TAINTED Turn-1 node bottom-up from the latest active root premises in canonical base units before computing d5 and d6 and converting to the requested output unit; (d) copy any UNTAINTED disjoint node (d_indep) verbatim from Turn 1 into \"preserved\".\n3. On every turn, output ONLY a single standalone valid JSON object starting with \"notes\" followed by \"step_id\", \"value\", \"unit\", \"retracted_ids\" (and \"preserved\" when requested), with zero surrounding prose or markdown fences."
+    }
+  },
+  "datasets": {
+    "v3_pilot_n50": {
+      "seed": 20261151,
+      "sample_count": 50,
+      "canonical_jsonl_sha256": "efb210b22d8f9810b3496a79c31ac1a656ddac627841bf925baaea688124dcf6"
+    },
+    "v3_main_eval_n800": {
+      "seed": 20261122,
+      "sample_count": 800,
+      "canonical_jsonl_sha256": "fbc72894c59ea40045070a1fed4b1b8f3f830ab694e60ea888c1ff188d11fdef",
+      "conditions": {
+        "A": {
+          "count": 400,
+          "sha256": "a81e435d9734afeb598cb3f61f5174f5ac8eb4a2f4360fd7a66e07e8c3698109"
+        },
+        "B": {
+          "count": 100,
+          "sha256": "c63049e131ff2dafc1c7ea2dc539ac24644208aae7073ce2452f16cb6b3fecc2"
+        },
+        "C": {
+          "count": 100,
+          "sha256": "d5df8c2fc5075d1ab6fe24e5a799807e5c2f0e9e55b55b7a03a51cd0ce46d675"
+        },
+        "D": {
+          "count": 100,
+          "sha256": "6e7a491db8717391485b82d0331c4264136872973be9363de6dd40a95984ee4b"
+        },
+        "E": {
+          "count": 100,
+          "sha256": "41df143b4e8d8d5256e7eab7a997a9e2f0d780b5c62fdeaf1f17451e95d51bff"
+        }
+      }
+    },
+    "v3_pr_validation_n160": {
+      "seed": 20261199,
+      "sample_count": 160,
+      "canonical_jsonl_sha256": "00f303ac578d98828ffba346cda4cd84a8f7c234e1fec95c9fd1ccd75fb60a65"
+    },
+    "ablation0_v2_single_prompt_n800": {
+      "seed": 20261122,
+      "sample_count": 800,
+      "summary_jsonl_sha256": "24fc4068915e9a6d2729d93aabc379574b2dc5cae7bb4ac3e2c823680325af1b"
+    }
+  },
+  "lock_manifest_sha256": "eac8d83e62ceb784f9096d5aab8540ee70a07f57d10950cb77fea57202502e53"
+}

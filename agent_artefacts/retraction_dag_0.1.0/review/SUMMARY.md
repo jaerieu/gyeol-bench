@@ -1,7 +1,33 @@
-# Review Summary: `gyeol_bench/retraction_dag` (`0.1.0`)
+# Review Summary: `gyeol_bench/retraction_dag_multiturn` (`0.1.0` · Capability-Stratified, 4-Tier `Arm 3` & `v0.3` Aliasing Synthesis)
 
-- **Registry Standard**: `UK AISI Inspect Evals` (`2026-05-08`)
-- **Static Isolation Audit**: `scripts/check_zero_core.py` -> `[안전]` (`0` private symbols, `0` external network leaks)
-- **Unit Suite**: `python3 -m unittest discover -s tests` -> `[안전]` (`7/7` tests covering `Condition A..E`, `response_adapter`, 4-way error split, `N=800` balance, and `retraction_dag` registration)
-- **Cross-Oracle & Inspect AI**: Out-of-repo `SymPy + Pint` `800/800` episodes (`0` mismatches, max relative diff `1.59e-16`) + `retraction_dag(sample_count=16)` verified in `inspect_ai`
-- **Release Gate**: Track A Clean-Room MVP (`Apache-2.0`, `<= 150` LoC net delta cap verified) ready for `jaerieu/gyeol-bench`.
+- **Registry Target**: `UK AISI Inspect Evals` (`2026-05-08` Decentralized External Package Specification)
+- **Primary Task**: `gyeol_bench/retraction_dag_multiturn` (`v3.0` 2-Live-Turn `Shared-Turn-1` Stateful Handoff; `gyeol_bench/retraction_dag` preserved intact as `Ablation 0`)
+- **Governance Verdict**: `[안전]` (Zero private-core symbols; all `13` frozen `day46-baseline-freeze.json` files `a542492e...` and `day60-empirical-results.json` `d46e4f21...` untouched; `Arm 3` 4-Tier results sealed in `manifests/arm3-empirical-k2-results.json` `615d24bb...`; `P0`/`P1`/`P2` controls sealed at `$2.909901 / $100.00 USD` and `118.85 / 3,251.14 CU`, `Active assignments: 0`)
+
+---
+
+## 1. Completed Technical, Empirical & Governance Reviews
+
+| Review Dimension | Verification Command / Artefact | Observed Result | Grade |
+| --- | --- | --- | --- |
+| **Zero Private-Core & Hygiene Audit** | `python3 scripts/check_zero_core.py` | `0` private symbols, `0` spectrum words, `0` box/tilde defects across all repository files | `[안전]` |
+| **Unit, Non-Circularity & Lock Suite** | `python3 -m unittest discover -s tests -v` | `100%` passing; `day46-baseline-freeze.json` (`a542492e...`), `v3-multiturn-prepilot-lock.json` (`eac8d83e...`), `day60-empirical-results.json` (`d46e4f21...`), and `p1-v03-aliasing-prelock.json` (`d937ff16...`) verified intact | `[안전]` |
+| **External `SymPy + Pint` Cross-Oracle (`v3.0` & `v0.3`)** | Out-of-repo `SymPy 1.14.0 + Pint 0.26.2` | `800 / 800` exact parity on `v3.0` (`seed = 20261122`) + `64 / 64` exact parity on `v0.3` value-aliasing (`seed = 20261153`, `0` mismatches) | `[안전]` |
+| **Stratum 1 (`Qwen3.8-27B`, `P1.1 Arm 1`, `v0.2` & `P1.2 v0.3` Eviction)** | `p2-qwen38-27b-control-results.json` (`4b300bb7...`), `p1-frontier-arm1-control-results.json`, `p1-frontier-v03-aliasing-results.json` | Dense `Qwen3.8-27B BF16` `47/50 = 94.0%` (`STALE 0`); `carbon` & `hydrogen` `P1.1 Arm 1` **`50/50`** (`seed = 20261122`); `v0.2` per-cell `0/50` stale (`95% CP` upper `7.11%`); `P1.2 v0.3` 3-way proof: `C1` `35/64` & `17/32` vs `C2_v1` `39/64` vs `C2_v2` **`64/64` (`p = 3.73e-09`)** & **`32/32` (`p = 6.104e-05`)** (`$2.909901 / $100.00 USD <= $5.00`) | `[안전]` |
+| **Phase 3 (`N = 800` Prompt-Only `Arm 2` Falsification)** | `manifests/day60-empirical-results.json` (`d46e4f21...`; bundle `785beb4c...`) | `K3` `3/3` PASS (`35.88%, 48.75%, 27.75% >= 10%`); **prompt-only `K2` falsified (`0/3`)** via structural seesaw (`STALE` `194 -> 16` [`-91.8%`] vs `OVER` `113 -> 517` `ITT` / `19 -> 412` `Clean-T1`) | `[경고]` -> `[안전]` Disclosed |
+| **Track 1A + `P0` / `P2` (`Arm 3` 4-Tier Verifier & `0.00 CU` Closeout)** | `manifests/arm3-empirical-k2-results.json` (`615d24bb...`, `Holm m = 30`, `118.85 / 3,251.14 CU <= 162.56 CU`) | Tier 1 (`0` turns, `0` oracle triggers) passes `K2` on `Phi-4` (`744/800`), `Mistral-24B` (`676/800`), `GLM-4.7-Flash` (`165/200`); Tier 3 (`arm3ab_hybrid`) passes `K2` on all `4` models (`Holm p <= 2.72e-18`); `P0` `0.00 CU` replay (`2,400` items, `+0` pass delta, `gb-0026` `PARSE -> STALE`); `P2` `Case 2B` `0.00 CU` Colab `503` stockout closeout | `[안전]` |
+
+---
+
+## 2. Enforced Claim Boundaries, 4-Tier Hierarchy & Verified `P0`/`P1`/`P2` Disclosures (`ITT` Primary)
+
+1. **No Positive `K2` Prompt Claim**: Prompt-only lineage checklists (`Arm 2`) failed `K2` (`0 / 3`: `Phi-4` `-0.125%`, `p=1.0000`; `Qwen2.5-14B` `-27.50%`, `p=2.09e-31`; `Mistral-24B` `-5.625%`, `p=2.33e-05`), proving that eliminating stale retention (`-91.8%`) via natural-language prompts alone induces severe over-retraction.
+2. **Capability & Active-Capacity Stratified Regime + Confirmatory `v0.3` Value-Aliasing Proof**: Contrasts dense `Qwen3.8-27B BF16` (`47/50 = 94.0%`, `STALE 0`, `L4 NF4` `105.291 s/item > 15 s/item`) and frontier `P1.1` same-harness `Arm 1` (`50/50 = 100.0%` on both `carbon` & `hydrogen`) against sparse MoE `GLM-4.7-Flash 30B-A3B BF16` (`102/200 = 51.0%`, `STALE 73` -> `arm3a` `165/200` -> `arm3ab_hybrid` `174/200`) and `14B..24B` open-weight cohorts. While `v0.2` (`gb-0048`, `n = 4` errors) served as an exploratory signal, pre-registered `P1.2 v0.3` (`seed = 20261153`, `100%` `p1 == p4`) provides confirmatory 3-way proof that `C1` self-summary collapses under value aliasing (`35/64` `VALUE_ALIASING_CONFUSION = 14` on `carbon`; `17/32` `VALUE_ALIASING_CONFUSION = 10` on `hydrogen`), values-only `C2_v1` (exposing the `v0.2` `"derived"` vs `"derive"` filter typo) fails (`39/64`), and explicit derivation-edge ledger `C2_v2` achieves **`64/64` (`p = 3.73e-09`)** and **`32/32` (`p = 6.104e-05`)** with `0` aliasing confusion.
+3. **4-Tier Verifier Hierarchy, `P0` Replay & `P2` Closeout (`ITT`-First Primacy)**:
+   - **Tier 1 (`0` turns, `0` numeric oracle triggers)**: `arm3a_prompt_raw`, `arm3a_structural_only` (`Phi-4` `744/800` `+231`; `Mistral-24B` `676/800` `+133`; `GLM-4.7-Flash` `165/200` `+63`).
+   - **Tier 2 (`0` turns, post-hoc structural hygiene + `P0` `0.00 CU` replay)**: `arm3b_structural_gate` (`Phi-4` `626/800`; `Qwen2.5-14B` `486/800`, `gb-0026` `PARSE_REJECT -> STALE_STATE_RETENTION` on patched non-E `preserved` strip, `Clean-T1 Cond A` `3/394` confirmed arithmetic; `Mistral-24B` `650/800`).
+   - **Tier 3 (`1` extra turn, Pass-1 `ExactRationalOracle` boolean residual trigger `SI_ARITH_RESIDUAL_MISMATCH` with `0` target numeric leakage)**: `arm3b_llm_repair`, `arm3ab_hybrid` (`Phi-4` `765/800 = 95.63%`, `Cond A ITT 0/400` `K4 PASS`; **`Qwen2.5-14B` `521/800 = 65.13%`, `Cond A K4 ITT 6/400 FAIL` vs `0/394 Clean-T1 PASS`**; **`Mistral-24B` `688/800 = 86.00%`, `Cond A ITT 4/400` `K4 PASS`, `205 / 800` Turn-1 exclusions disclosed**).
+   - **Tier 4 (`is_primary_k2_eligible: false`, excluded from `Holm m = 30`)**: `arm3a_full_ceiling`, `arm3b_symbolic_ceiling` (`800/800`).
+   - **`P2` `Case 2B` `0.00 CU` Offline Closeout**: Records `2026-11-24` Colab `A100/H100/G4` `503` stockout (`0.00 CU` burned, `Active assignments: 0`), `quarantinedPreFixProvenance` (`28/100`), staged `t1only` cache (`ffdc749b...`), and `deferred_colab_80gb_503_stockout`.
+4. **Five Verified Audit Disclosures & `DSL-Schema Scope` Non-Claim**: Retains all 5 audit disclosures (`4.18e-72` Holm tie; `PARSE_REJECT = 0` `arm3a` no-op identity; `Qwen14B STALE 85 -> 8` vs `S+O 92` with `84` Turn-1 carryover `OVER`; `Qwen14B` standalone `arm3b_llm_repair` `PARSE_REJECT = 250` negative result; `GLM-4.7-Flash` symmetric prefill & `</think>` strip parity) and the **Explicit Non-Claim (`DSL-Schema Scope`)**.
+5. **Remaining External Sign-Off Gate**: Reconcile blinded `N = 160` (`>= 150`) external human audit (`[PENDING_EXTERNAL_HUMAN_AUDIT_N160]`, `SEALED_KEY_COMMITMENT.json` `3a85aca2...`) and 14-day community PR window prior to upstream `inspect_evals` submission.
